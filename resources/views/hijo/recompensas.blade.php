@@ -4,34 +4,40 @@
 
 @section('content')
 
-<div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 mb-5 flex items-center justify-between text-white">
-    <div>
-        <p class="text-sm opacity-80">Tus monedas disponibles</p>
-        <p class="text-3xl font-extrabold">🪙 {{ $hijo->monedas }}</p>
+{{-- Balance --}}
+<div class="card-fade bg-white/20 backdrop-blur-sm rounded-3xl p-5 mb-5 border border-white/25 shadow-lg">
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-white/75 text-sm font-medium">Tus monedas</p>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="sparkle text-3xl">🪙</span>
+                <span class="text-4xl font-extrabold text-white">{{ $hijo->monedas }}</span>
+            </div>
+        </div>
+        <div class="text-6xl opacity-30">🏪</div>
     </div>
-    <div class="text-4xl">🏪</div>
 </div>
 
 @if($errors->any())
-    <div class="mb-4 bg-red-400 text-white rounded-2xl px-4 py-3">
-        {{ $errors->first() }}
+    <div class="mb-4 bg-red-500/80 text-white rounded-2xl px-4 py-3 border border-red-400/50 card-fade">
+        <p class="font-semibold text-sm">⚠️ {{ $errors->first() }}</p>
     </div>
 @endif
 
-{{-- Canjes activos --}}
+{{-- Canjes pendientes --}}
 @if($canjesPendientes->isNotEmpty())
-    <div class="mb-5">
-        <h2 class="text-white font-bold text-lg mb-3">⏳ Mis solicitudes</h2>
+    <div class="mb-6">
+        <h2 class="text-white font-extrabold text-lg mb-3 drop-shadow">⏳ Mis solicitudes</h2>
         <div class="space-y-2">
             @foreach($canjesPendientes as $canje)
-                <div class="bg-white rounded-2xl p-4 flex items-center gap-3">
-                    <span class="text-2xl">🎁</span>
-                    <div class="flex-1">
-                        <p class="font-medium text-gray-800 text-sm">{{ $canje->recompensa->nombre }}</p>
+                <div class="bg-white rounded-2xl p-4 flex items-center gap-3 shadow-md">
+                    <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-2xl flex-shrink-0">🎁</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-gray-800 text-sm truncate">{{ $canje->recompensa->nombre }}</p>
                         <p class="text-xs text-gray-500">🪙 {{ $canje->monedas_gastadas }}</p>
                     </div>
-                    <span class="text-xs px-3 py-1 rounded-full {{ $canje->estadoColor() }}">
-                        {{ $canje->estado === 'PENDIENTE' ? 'Esperando...' : '¡Aprobado! 🎉' }}
+                    <span class="text-xs font-bold px-3 py-1.5 rounded-full {{ $canje->estadoColor() }} whitespace-nowrap">
+                        {{ $canje->estado === 'PENDIENTE' ? '⏳ Esperando' : '✅ ¡Aprobado!' }}
                     </span>
                 </div>
             @endforeach
@@ -40,40 +46,49 @@
 @endif
 
 {{-- Catálogo --}}
-<h2 class="text-white font-bold text-lg mb-3">🎁 Recompensas disponibles</h2>
+<h2 class="text-white font-extrabold text-lg mb-3 drop-shadow">🎁 Recompensas disponibles</h2>
 
 @if($recompensas->isEmpty())
-    <div class="bg-white/20 rounded-2xl p-8 text-center text-white/80">
-        <span class="text-4xl block mb-2">😕</span>
-        <p>Aún no hay recompensas disponibles. ¡Tu padre/madre tiene que añadirlas!</p>
+    <div class="bg-white/20 backdrop-blur-sm rounded-3xl p-10 text-center border border-white/25">
+        <span class="text-5xl block mb-3">😕</span>
+        <p class="text-white font-bold">Aún no hay recompensas</p>
+        <p class="text-white/70 text-sm mt-1">Pide a tu padre o madre que añada recompensas</p>
     </div>
 @else
     <div class="grid grid-cols-2 gap-3">
         @foreach($recompensas as $recompensa)
             @php $puedeComprar = $hijo->monedas >= $recompensa->monedas_necesarias; @endphp
-            <div class="bg-white rounded-2xl p-4 {{ !$puedeComprar ? 'opacity-60' : '' }}">
-                <div class="text-3xl text-center mb-2">🎁</div>
-                <p class="font-semibold text-gray-800 text-sm text-center mb-1">{{ $recompensa->nombre }}</p>
+            <div class="reward-card bg-white rounded-2xl p-4 shadow-md {{ !$puedeComprar ? 'opacity-55' : '' }}">
+                <!-- Icono -->
+                <div class="text-4xl text-center mb-2">🎁</div>
+
+                <!-- Nombre -->
+                <p class="font-extrabold text-gray-800 text-sm text-center leading-tight mb-1">{{ $recompensa->nombre }}</p>
+
                 @if($recompensa->descripcion)
-                    <p class="text-xs text-gray-500 text-center mb-2">{{ $recompensa->descripcion }}</p>
+                    <p class="text-xs text-gray-500 text-center mb-2 leading-tight">{{ $recompensa->descripcion }}</p>
                 @endif
-                <div class="flex items-center justify-center gap-1 text-yellow-600 font-bold text-sm mb-3">
-                    <span>🪙</span>
-                    <span>{{ $recompensa->monedas_necesarias }}</span>
+
+                <!-- Precio -->
+                <div class="flex items-center justify-center gap-1 mb-3">
+                    <span class="text-base">🪙</span>
+                    <span class="font-extrabold text-yellow-600 text-base">{{ $recompensa->monedas_necesarias }}</span>
                 </div>
 
                 @if($puedeComprar)
                     <form action="{{ route('hijo.recompensas.canjear', $recompensa) }}" method="POST"
-                          onsubmit="return confirm('¿Canjear «{{ $recompensa->nombre }}» por {{ $recompensa->monedas_necesarias }} monedas?')">
+                          onsubmit="return confirm('¿Canjear {{ $recompensa->nombre }} por {{ $recompensa->monedas_necesarias }} monedas? 🎁')">
                         @csrf
                         <button type="submit"
-                                class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold py-2 rounded-xl transition active:scale-95">
-                            ¡Canjear!
+                                class="btn-complete w-full text-white text-sm font-extrabold py-2.5 rounded-xl shadow-md"
+                                style="background: linear-gradient(135deg, #7c3aed, #ec4899);">
+                            ¡Canjear! 🎉
                         </button>
                     </form>
                 @else
-                    <div class="w-full bg-gray-100 text-gray-400 text-xs font-medium py-2 rounded-xl text-center">
-                        Faltan {{ $recompensa->monedas_necesarias - $hijo->monedas }} 🪙
+                    @php $faltan = $recompensa->monedas_necesarias - $hijo->monedas; @endphp
+                    <div class="w-full bg-gray-100 text-gray-400 text-xs font-bold py-2.5 rounded-xl text-center">
+                        Faltan {{ $faltan }} 🪙
                     </div>
                 @endif
             </div>
