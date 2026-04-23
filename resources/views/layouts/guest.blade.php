@@ -62,10 +62,10 @@
         .btn-primary:active { transform: scale(0.98); }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-violet-100 via-indigo-50 to-sky-100 flex items-center justify-center p-4 overflow-hidden relative">
+<body class="min-h-screen bg-gradient-to-br from-violet-100 via-indigo-50 to-sky-100 flex items-center justify-center p-4 relative">
 
     <!-- Blobs decorativos -->
-    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+    <div class="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div class="absolute -top-40 -left-40 w-[480px] h-[480px] bg-purple-200/40 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-40 -right-40 w-[480px] h-[480px] bg-indigo-200/40 rounded-full blur-3xl"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-pink-100/50 rounded-full blur-2xl"></div>
