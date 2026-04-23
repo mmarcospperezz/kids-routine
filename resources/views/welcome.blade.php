@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kids Routine — Convierte las rutinas en aventuras</title>
+    <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes float {
@@ -45,8 +46,7 @@
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 z-50 shadow-sm">
         <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center text-xl shadow-sm"
-                     style="background: linear-gradient(135deg, #6366f1, #a855f7);">🌟</div>
+                <img src="{{ asset('images/logo.svg') }}" alt="Kids Routine" class="w-9 h-9 rounded-xl shadow-sm">
                 <span class="text-xl font-extrabold text-indigo-700">Kids Routine</span>
             </a>
             <div class="flex items-center gap-3">
