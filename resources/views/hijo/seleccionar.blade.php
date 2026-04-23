@@ -84,10 +84,15 @@
                         <button type="submit"
                                 class="child-card card-in-{{ min($index + 1, 4) }} w-full bg-white/95 backdrop-blur rounded-2xl p-5 flex items-center gap-4 text-left shadow-xl border border-white/50">
                             <!-- Avatar -->
-                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-md flex-shrink-0"
-                                 style="background: linear-gradient(135deg, #a855f7, #ec4899);">
-                                {{ $hijo->avatarEmoji() }}
-                            </div>
+                            @if($hijo->avatarUrl())
+                                <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                                     class="w-16 h-16 rounded-2xl object-cover shadow-md flex-shrink-0 border-2 border-white/50">
+                            @else
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl text-white shadow-md flex-shrink-0"
+                                     style="background: {{ $hijo->avatarColor() }}">
+                                    {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                                </div>
+                            @endif
                             <!-- Info -->
                             <div class="flex-1 min-w-0">
                                 <p class="font-extrabold text-gray-800 text-xl leading-tight">{{ $hijo->nombre }}</p>

@@ -11,10 +11,15 @@
 
 <div class="max-w-lg">
     <div class="flex items-center gap-4 mb-6">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-md"
-             style="background: linear-gradient(135deg, #a855f7, #ec4899);">
-            {{ $hijo->avatarEmoji() }}
-        </div>
+        @if($hijo->avatarUrl())
+            <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                 class="w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-slate-200">
+        @else
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-md"
+                 style="background: {{ $hijo->avatarColor() }}">
+                {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+            </div>
+        @endif
         <div>
             <h1 class="text-2xl font-extrabold text-gray-900">Editar: {{ $hijo->nombre }}</h1>
             <p class="text-slate-500 text-sm">{{ $hijo->edad }} años · 🪙 {{ $hijo->monedas }} monedas</p>
@@ -22,7 +27,7 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form action="{{ route('padre.hijos.update', $hijo) }}" method="POST" class="space-y-5">
+        <form action="{{ route('padre.hijos.update', $hijo) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf @method('PUT')
 
             <div>
@@ -61,6 +66,27 @@
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white"
                        placeholder="Sin límite">
                 @error('monedas_tope') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Foto de perfil (opcional)</label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    @if($hijo->avatarUrl())
+                        <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                             class="w-12 h-12 rounded-xl object-cover border-2 border-slate-200 group-hover:border-indigo-400 transition">
+                    @else
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center font-black text-xl text-white border-2 border-slate-200 group-hover:border-indigo-400 transition"
+                             style="background: {{ $hijo->avatarColor() }}">
+                            {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                        </div>
+                    @endif
+                    <div>
+                        <span class="block text-sm font-medium text-indigo-600 group-hover:text-indigo-700">📷 Cambiar foto</span>
+                        <span class="text-xs text-slate-400">JPG, PNG o GIF · máx 2MB</span>
+                    </div>
+                    <input type="file" name="avatar" accept="image/*" class="hidden">
+                </label>
+                @error('avatar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="flex gap-3 pt-2">

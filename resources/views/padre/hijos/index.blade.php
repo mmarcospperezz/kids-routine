@@ -39,10 +39,15 @@
                         @endif
                     </div>
                     <!-- Avatar sobreexpuesto -->
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-lg border-4 border-white -mb-8"
-                         style="background: linear-gradient(135deg, #a855f7, #ec4899);">
-                        {{ $hijo->avatarEmoji() }}
-                    </div>
+                    @if($hijo->avatarUrl())
+                        <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                             class="w-16 h-16 rounded-2xl object-cover shadow-lg border-4 border-white -mb-8">
+                    @else
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg border-4 border-white -mb-8"
+                             style="background: {{ $hijo->avatarColor() }}">
+                            {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                        </div>
+                    @endif
                 </div>
 
                 <div class="pt-10 px-5 pb-5">

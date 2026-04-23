@@ -106,10 +106,15 @@
             <div class="space-y-2.5">
                 @foreach($hijos as $hijo)
                     <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 transition">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                             style="background: linear-gradient(135deg, #e0e7ff, #f3e8ff);">
-                            {{ $hijo->avatarEmoji() }}
-                        </div>
+                        @if($hijo->avatarUrl())
+                            <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                                 class="w-10 h-10 rounded-xl object-cover flex-shrink-0">
+                        @else
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-white flex-shrink-0"
+                                 style="background: {{ $hijo->avatarColor() }}">
+                                {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                            </div>
+                        @endif
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-gray-800 text-sm">{{ $hijo->nombre }}</p>
                             <p class="text-xs text-slate-500">{{ $hijo->edad }} años</p>
@@ -145,7 +150,15 @@
             <div class="space-y-2">
                 @foreach($tareasHoy as $instancia)
                     <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                        <span class="text-lg flex-shrink-0">{{ $instancia->hijo->avatarEmoji() }}</span>
+                        @if($instancia->hijo->avatarUrl())
+                            <img src="{{ $instancia->hijo->avatarUrl() }}" alt="{{ $instancia->hijo->nombre }}"
+                                 class="w-7 h-7 rounded-lg object-cover flex-shrink-0">
+                        @else
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs text-white flex-shrink-0"
+                                 style="background: {{ $instancia->hijo->avatarColor() }}">
+                                {{ mb_strtoupper(mb_substr($instancia->hijo->nombre, 0, 1)) }}
+                            </div>
+                        @endif
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-800 truncate">{{ $instancia->tarea->titulo }}</p>
                             <p class="text-xs text-slate-500">{{ $instancia->hijo->nombre }}</p>

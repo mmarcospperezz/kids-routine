@@ -69,11 +69,9 @@
     </nav>
 
     <!-- Hero -->
-    <section class="pt-28 pb-24 px-6 relative overflow-hidden"
+    <section class="pt-32 pb-24 px-6 relative"
              style="background: linear-gradient(160deg, #eef2ff 0%, #fdf4ff 50%, #fff7ed 100%);">
-
-        <!-- Blobs decorativos -->
-        <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
             <div class="glow absolute top-10 left-1/4 w-80 h-80 bg-purple-200/40 rounded-full blur-3xl"></div>
             <div class="glow absolute bottom-10 right-1/4 w-80 h-80 bg-indigo-200/40 rounded-full blur-3xl" style="animation-delay: 2s;"></div>
             <span class="f1 absolute top-[10%] left-[5%] text-5xl opacity-30 select-none">⭐</span>

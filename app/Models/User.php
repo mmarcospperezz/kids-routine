@@ -19,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password_hash',
         'rol',
+        'avatar',
     ];
 
     protected $hidden = [
@@ -29,6 +30,11 @@ class User extends Authenticatable
     public function getAuthPassword(): string
     {
         return $this->password_hash;
+    }
+
+    public function avatarUrl(): ?string
+    {
+        return $this->avatar ? asset('storage/avatars/' . $this->avatar) : null;
     }
 
     public function hijos()

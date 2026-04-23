@@ -29,10 +29,15 @@
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <!-- Header del hijo -->
                 <div class="flex items-center gap-3 px-5 py-4 bg-slate-50 border-b border-slate-100">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-2xl"
-                         style="background: linear-gradient(135deg, #e0e7ff, #fdf2f8);">
-                        {{ $hijo->avatarEmoji() }}
-                    </div>
+                    @if($hijo->avatarUrl())
+                        <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                             class="w-10 h-10 rounded-xl object-cover">
+                    @else
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm text-white"
+                             style="background: {{ $hijo->avatarColor() }}">
+                            {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                        </div>
+                    @endif
                     <div class="flex-1">
                         <h2 class="font-extrabold text-gray-800">{{ $hijo->nombre }}</h2>
                         <p class="text-xs text-slate-500">{{ $hijo->tareas->count() }} tarea(s) activa(s)</p>

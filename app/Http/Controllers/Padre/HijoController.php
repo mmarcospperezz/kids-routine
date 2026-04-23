@@ -7,6 +7,7 @@ use App\Models\Hijo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class HijoController extends Controller
 {
@@ -24,18 +25,26 @@ class HijoController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nombre' => 'required|string|max:100',
-            'edad' => 'required|integer|min:1|max:18',
-            'pin' => 'required|digits:4',
+            'nombre'       => 'required|string|max:100',
+            'edad'         => 'required|integer|min:1|max:18',
+            'pin'          => 'required|digits:4',
             'monedas_tope' => 'nullable|integer|min:0',
+            'avatar'       => 'nullable|image|max:2048',
         ]);
 
+        $avatarNombre = null;
+        if ($request->hasFile('avatar')) {
+            $avatarNombre = $request->file('avatar')->store('avatars', 'public');
+            $avatarNombre = basename($avatarNombre);
+        }
+
         Auth::user()->hijos()->create([
-            'nombre' => $data['nombre'],
-            'edad' => (int) $data['edad'],
-            'pin_hash' => Hash::make($data['pin']),
+            'nombre'       => $data['nombre'],
+            'edad'         => (int) $data['edad'],
+            'pin_hash'     => Hash::make($data['pin']),
             'monedas_tope' => $data['monedas_tope'] ?? null,
-            'monedas' => 0,
+            'monedas'      => 0,
+            'avatar'       => $avatarNombre,
         ]);
 
         return redirect()->route('padre.hijos.index')
@@ -53,19 +62,27 @@ class HijoController extends Controller
         $this->autorizarHijo($hijo);
 
         $data = $request->validate([
-            'nombre' => 'required|string|max:100',
-            'edad' => 'required|integer|min:1|max:18',
-            'pin' => 'nullable|digits:4',
+            'nombre'       => 'required|string|max:100',
+            'edad'         => 'required|integer|min:1|max:18',
+            'pin'          => 'nullable|digits:4',
             'monedas_tope' => 'nullable|integer|min:0',
-            'monedas' => 'required|integer|min:0',
+            'monedas'      => 'required|integer|min:0',
+            'avatar'       => 'nullable|image|max:2048',
         ]);
 
         $update = [
-            'nombre' => $data['nombre'],
-            'edad' => (int) $data['edad'],
+            'nombre'       => $data['nombre'],
+            'edad'         => (int) $data['edad'],
             'monedas_tope' => $data['monedas_tope'],
-            'monedas' => (int) $data['monedas'],
+            'monedas'      => (int) $data['monedas'],
         ];
+
+        if ($request->hasFile('avatar')) {
+            if ($hijo->avatar) {
+                Storage::disk('public')->delete('avatars/' . $hijo->avatar);
+            }
+            $update['avatar'] = basename($request->file('avatar')->store('avatars', 'public'));
+        }
 
         if (!empty($data['pin'])) {
             $update['pin_hash'] = Hash::make($data['pin']);

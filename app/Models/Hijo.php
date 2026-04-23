@@ -56,9 +56,21 @@ class Hijo extends Model
         return $this->bloqueado_hasta !== null && now()->lt($this->bloqueado_hasta);
     }
 
-    public function avatarEmoji(): string
+    public function avatarUrl(): ?string
     {
-        $emojis = ['🐱', '🐶', '🐸', '🦊', '🐼', '🐨', '🦁', '🐯', '🐮', '🐷'];
-        return $emojis[$this->id_hijo % count($emojis)];
+        return $this->avatar ? asset('storage/avatars/' . $this->avatar) : null;
+    }
+
+    public function avatarColor(): string
+    {
+        $gradients = [
+            'linear-gradient(135deg,#a855f7,#ec4899)',
+            'linear-gradient(135deg,#3b82f6,#06b6d4)',
+            'linear-gradient(135deg,#10b981,#34d399)',
+            'linear-gradient(135deg,#f59e0b,#f97316)',
+            'linear-gradient(135deg,#ef4444,#f43f5e)',
+            'linear-gradient(135deg,#8b5cf6,#6366f1)',
+        ];
+        return $gradients[$this->id_hijo % count($gradients)];
     }
 }

@@ -16,7 +16,7 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <form action="{{ route('padre.hijos.store') }}" method="POST" class="space-y-5">
+        <form action="{{ route('padre.hijos.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
 
             <div>
@@ -51,6 +51,20 @@
                        placeholder="Sin límite">
                 <p class="text-slate-400 text-xs mt-1.5">Máximo de monedas que puede acumular</p>
                 @error('monedas_tope') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Foto de perfil (opcional)</label>
+                <label class="flex items-center gap-3 cursor-pointer group border border-dashed border-slate-300 hover:border-indigo-400 rounded-xl px-4 py-3 transition">
+                    <span class="text-2xl">📷</span>
+                    <div>
+                        <span class="block text-sm font-medium text-indigo-600 group-hover:text-indigo-700">Subir foto</span>
+                        <span class="text-xs text-slate-400">JPG, PNG o GIF · máx 2MB</span>
+                    </div>
+                    <input type="file" name="avatar" accept="image/*" class="hidden"
+                           onchange="this.previousElementSibling.previousElementSibling.textContent = this.files[0]?.name ?? '📷'">
+                </label>
+                @error('avatar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="flex gap-3 pt-2">

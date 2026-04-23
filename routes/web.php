@@ -8,6 +8,7 @@ use App\Http\Controllers\Padre\TareaController;
 use App\Http\Controllers\Padre\RecompensaController;
 use App\Http\Controllers\Padre\ValidacionController;
 use App\Http\Controllers\Padre\CanjeController;
+use App\Http\Controllers\Padre\PerfilController;
 use App\Http\Controllers\Hijo\SesionController;
 use App\Http\Controllers\Hijo\DashboardController as HijoDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Panel del padre
 Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/perfil/avatar', [PerfilController::class, 'updateAvatar'])->name('perfil.avatar');
 
     // Gestión de hijos
     Route::get('/hijos', [HijoController::class, 'index'])->name('hijos.index');

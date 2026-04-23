@@ -27,7 +27,7 @@
                     @foreach($hijos as $hijo)
                         <option value="{{ $hijo->id_hijo }}"
                                 {{ old('id_hijo', request('hijo')) == $hijo->id_hijo ? 'selected' : '' }}>
-                            {{ $hijo->avatarEmoji() }} {{ $hijo->nombre }}
+                            {{ $hijo->nombre }}
                         </option>
                     @endforeach
                 </select>

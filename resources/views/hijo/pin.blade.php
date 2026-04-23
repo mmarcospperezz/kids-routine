@@ -102,10 +102,15 @@
 
         <!-- Avatar + saludo -->
         <div class="fade-up text-center mb-8">
-            <div class="w-24 h-24 rounded-3xl mx-auto mb-4 flex items-center justify-center text-5xl shadow-2xl border-2 border-white/30"
-                 style="background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15)); backdrop-filter: blur(12px);">
-                {{ $hijo->avatarEmoji() }}
-            </div>
+            @if($hijo->avatarUrl())
+                <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                     class="w-24 h-24 rounded-3xl mx-auto mb-4 object-cover shadow-2xl border-2 border-white/50">
+            @else
+                <div class="w-24 h-24 rounded-3xl mx-auto mb-4 flex items-center justify-center font-black text-5xl text-white shadow-2xl border-2 border-white/30"
+                     style="background: {{ $hijo->avatarColor() }}">
+                    {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                </div>
+            @endif
             <h2 class="text-3xl font-extrabold text-white drop-shadow-md">¡Hola, {{ $hijo->nombre }}!</h2>
             <p class="text-white/75 text-base mt-1">Escribe tu PIN secreto 🔐</p>
         </div>

@@ -20,10 +20,15 @@
             <div class="bg-white rounded-2xl shadow-sm border border-amber-100 p-5 hover:shadow-md transition">
                 <div class="flex items-start gap-4">
                     <!-- Avatar hijo -->
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm"
-                         style="background: linear-gradient(135deg, #e0e7ff, #fdf2f8);">
-                        {{ $instancia->hijo->avatarEmoji() }}
-                    </div>
+                    @if($instancia->hijo->avatarUrl())
+                        <img src="{{ $instancia->hijo->avatarUrl() }}" alt="{{ $instancia->hijo->nombre }}"
+                             class="w-12 h-12 rounded-2xl object-cover flex-shrink-0 shadow-sm">
+                    @else
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl text-white flex-shrink-0 shadow-sm"
+                             style="background: {{ $instancia->hijo->avatarColor() }}">
+                            {{ mb_strtoupper(mb_substr($instancia->hijo->nombre, 0, 1)) }}
+                        </div>
+                    @endif
 
                     <div class="flex-1 min-w-0">
                         <div class="flex items-start justify-between gap-4 mb-1">
