@@ -123,6 +123,11 @@
                    {{ request()->routeIs('hijo.recompensas') ? 'bg-white text-purple-700 shadow-md' : 'text-white/80 hover:bg-white/20 hover:text-white' }}">
                     🛍️ Tienda
                 </a>
+                <a href="{{ route('hijo.juegos') }}"
+                   class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold transition
+                   {{ request()->routeIs('hijo.juegos*') ? 'bg-white text-purple-700 shadow-md' : 'text-white/80 hover:bg-white/20 hover:text-white' }}">
+                    🎮 Juegos
+                </a>
             </div>
         </div>
     </header>

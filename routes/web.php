@@ -9,8 +9,10 @@ use App\Http\Controllers\Padre\RecompensaController;
 use App\Http\Controllers\Padre\ValidacionController;
 use App\Http\Controllers\Padre\CanjeController;
 use App\Http\Controllers\Padre\PerfilController;
+use App\Http\Controllers\Padre\JuegoController as PadreJuegoController;
 use App\Http\Controllers\Hijo\SesionController;
 use App\Http\Controllers\Hijo\DashboardController as HijoDashboardController;
+use App\Http\Controllers\Hijo\JuegoController as HijoJuegoController;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
@@ -63,6 +65,10 @@ Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
     Route::post('/canjes/{canje}/aprobar', [CanjeController::class, 'aprobar'])->name('canjes.aprobar');
     Route::post('/canjes/{canje}/rechazar', [CanjeController::class, 'rechazar'])->name('canjes.rechazar');
     Route::post('/canjes/{canje}/entregar', [CanjeController::class, 'entregar'])->name('canjes.entregar');
+
+    // Configuración de juegos educativos
+    Route::get('/juegos', [PadreJuegoController::class, 'index'])->name('juegos.index');
+    Route::post('/juegos', [PadreJuegoController::class, 'guardar'])->name('juegos.guardar');
 });
 
 // Sesión del hijo (necesita padre logueado)
@@ -79,4 +85,9 @@ Route::middleware(['padre', 'hijo'])->prefix('hijo')->name('hijo.')->group(funct
     Route::post('/tareas/{instancia}/completar', [HijoDashboardController::class, 'completarTarea'])->name('tareas.completar');
     Route::get('/recompensas', [HijoDashboardController::class, 'recompensas'])->name('recompensas');
     Route::post('/recompensas/{recompensa}/canjear', [HijoDashboardController::class, 'canjear'])->name('recompensas.canjear');
+
+    // Juegos educativos
+    Route::get('/juegos', [HijoJuegoController::class, 'index'])->name('juegos');
+    Route::get('/juegos/{juego}', [HijoJuegoController::class, 'jugar'])->name('juegos.jugar');
+    Route::post('/juegos/{juego}/completar', [HijoJuegoController::class, 'completar'])->name('juegos.completar');
 });

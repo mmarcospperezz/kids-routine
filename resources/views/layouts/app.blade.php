@@ -127,6 +127,11 @@
                     <span class="bg-pink-400 text-pink-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pendCanj }}</span>
                 @endif
             </a>
+            <a href="{{ route('padre.juegos.index') }}"
+               class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 text-sm font-medium
+               {{ request()->routeIs('padre.juegos.*') ? 'bg-white/20 text-white shadow-sm' : 'text-indigo-200 hover:bg-white/10 hover:text-white' }}">
+                <span class="w-5 text-center">🎮</span> Juegos
+            </a>
 
             <div class="border-t border-indigo-700/40 my-3"></div>
             <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-widest px-2 mb-2">Niños</p>
