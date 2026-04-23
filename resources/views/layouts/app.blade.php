@@ -40,7 +40,7 @@
 
         <div class="px-5 py-5 border-b border-indigo-700/60">
             <a href="{{ route('padre.dashboard') }}" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center text-xl group-hover:bg-white/25 transition">🌟</div>
+                <img src="{{ asset('images/logo.svg') }}" alt="Kids Routine" class="w-10 h-10 rounded-xl group-hover:opacity-90 transition">
                 <div>
                     <div class="font-bold text-base leading-tight">Kids Routine</div>
                     <div class="text-indigo-300 text-xs">Panel Familiar</div>
@@ -160,7 +160,7 @@
                 </svg>
             </button>
             <div class="flex items-center gap-2">
-                <span class="text-xl">🌟</span>
+                <img src="{{ asset('images/logo.svg') }}" alt="Kids Routine" class="w-7 h-7 rounded-lg">
                 <span class="font-bold text-indigo-700">Kids Routine</span>
             </div>
             @if(auth()->user()->avatarUrl())

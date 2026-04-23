@@ -61,8 +61,8 @@
 
         <!-- Título -->
         <div class="title-in text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur rounded-3xl mb-4 border-2 border-white/30 shadow-2xl">
-                <span class="text-4xl">👨‍👩‍👧‍👦</span>
+            <div class="inline-block mb-4">
+                <img src="{{ asset('images/logo.svg') }}" alt="Kids Routine" class="w-20 h-20 rounded-3xl shadow-2xl border-2 border-white/30">
             </div>
             <h1 class="text-4xl font-extrabold text-white drop-shadow-lg">¿Quién eres?</h1>
             <p class="text-white/80 text-base mt-2">Elige tu perfil para empezar</p>

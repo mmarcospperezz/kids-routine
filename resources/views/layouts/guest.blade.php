@@ -80,8 +80,8 @@
     <div class="relative z-10 w-full max-w-md">
         <!-- Logo -->
         <div class="fade-up text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-white rounded-3xl shadow-xl mb-4 relative">
-                <span class="pulse-soft text-4xl">🌟</span>
+            <div class="inline-block relative mb-4">
+                <img src="{{ asset('images/logo.svg') }}" alt="Kids Routine" class="w-20 h-20 rounded-3xl shadow-xl drop-shadow-lg">
                 <div class="absolute inset-0 rounded-3xl ring-4 ring-purple-300/30 animate-ping"></div>
             </div>
             <h1 class="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
