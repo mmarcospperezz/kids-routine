@@ -4,4 +4,4 @@ builder = "nixpacks"
 [deploy]
 startCommand = "php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan storage:link --force && php artisan serve --host=0.0.0.0 --port=$PORT"
 healthcheckPath = "/up"
-healthcheckTimeout = 30
+healthcheckTimeout = 120
