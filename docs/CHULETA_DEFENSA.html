@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; margin: 2cm; color: #1a1a1a; }
+  h1 { font-size: 22pt; color: #2563eb; border-bottom: 3px solid #2563eb; padding-bottom: 6px; }
+  h2 { font-size: 16pt; color: #1d4ed8; border-bottom: 1px solid #93c5fd; padding-bottom: 4px; margin-top: 24px; }
+  h3 { font-size: 13pt; color: #1e40af; margin-top: 16px; }
+  h4 { font-size: 11pt; color: #374151; margin-top: 10px; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 10pt; }
+  th { background: #2563eb; color: white; padding: 6px 10px; text-align: left; }
+  td { border: 1px solid #d1d5db; padding: 5px 10px; vertical-align: top; }
+  tr:nth-child(even) { background: #f0f7ff; }
+  code { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 3px; padding: 1px 4px; font-family: Consolas, monospace; font-size: 10pt; color: #0f172a; }
+  pre { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px; font-family: Consolas, monospace; font-size: 9.5pt; line-height: 1.4; overflow-x: auto; }
+  .badge { display: inline-block; background: #dbeafe; color: #1e40af; border-radius: 12px; padding: 2px 10px; font-size: 9pt; font-weight: bold; margin: 2px; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-purple { background: #f3e8ff; color: #6b21a8; }
+  .callout { background: #eff6ff; border-left: 4px solid #2563eb; padding: 10px 14px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .callout-green { background: #f0fdf4; border-left-color: #16a34a; }
+  .callout-yellow { background: #fefce8; border-left-color: #ca8a04; }
+  ul li { margin-bottom: 4px; }
+  .page-break { page-break-before: always; }
+  .subtitle { color: #6b7280; font-size: 13pt; margin-top: -10px; }
+  .flow { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+  .flow-step { background: #2563eb; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10pt; }
+  .flow-arrow { color: #9ca3af; font-size: 14pt; }
+</style>
+</head>
+<body>
+
+<h1>Kids Routine — Chuleta Defensa TFG</h1>
+<p class="subtitle">DAW · Marcos Pérez · 2026</p>
+
+<div class="callout">
+  <strong>URL en producción:</strong> <code>https://kids-routine-production.up.railway.app</code><br>
+  <strong>Demo:</strong> <code>demo@kidsroutine.com</code> / <code>demo123</code> &nbsp;·&nbsp;
+  <strong>Sofía PIN:</strong> <code>1234</code> &nbsp;·&nbsp; <strong>Pablo PIN:</strong> <code>5678</code>
+</div>
+
+<!-- ============================================================ -->
+<h2>1. ¿Qué es Kids Routine?</h2>
+
+<p>Aplicación web para que los padres gestionen las rutinas y tareas diarias de sus hijos. Los niños completan tareas, acumulan monedas virtuales y las canjean por recompensas reales que define el padre.</p>
+
+<h3>Problema que resuelve</h3>
+<ul>
+  <li>Padres que no tienen forma digital de hacer seguimiento de tareas del hogar de sus hijos.</li>
+  <li>Niños que necesitan motivación tangible: sistema de recompensas gamificado.</li>
+  <li>Acceso infantil seguro sin email/contraseña: solo PIN numérico de 4 dígitos.</li>
+</ul>
+
+<h3>Flujo principal</h3>
+<div class="flow">
+  <span class="flow-step">Padre crea cuenta</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Añade hijos con PIN</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Crea tareas y recompensas</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Hijo completa tareas</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Padre valida</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Hijo gana monedas</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Hijo canjea recompensas</span>
+</div>
+
+<!-- ============================================================ -->
+<h2>2. Stack tecnológico</h2>
+
+<table>
+  <tr><th>Capa</th><th>Tecnología</th><th>Versión</th><th>Por qué</th></tr>
+  <tr><td>Backend</td><td>Laravel (PHP)</td><td>13.0 / PHP 8.3</td><td>Framework MVC robusto, ORM Eloquent, autenticación integrada</td></tr>
+  <tr><td>Base de datos</td><td>MySQL</td><td>8.x</td><td>Relacional, ideal para datos con muchas relaciones (tareas, hijos, canjes)</td></tr>
+  <tr><td>Frontend</td><td>Blade + Tailwind CSS</td><td>Tailwind 4.0</td><td>Motor de plantillas de Laravel, CSS utility-first sin JavaScript pesado</td></tr>
+  <tr><td>Build tool</td><td>Vite</td><td>8.0</td><td>Compilador de assets rápido, integrado con Laravel</td></tr>
+  <tr><td>Servidor local</td><td>Laragon</td><td>—</td><td>Entorno Windows all-in-one (Apache, PHP, MySQL)</td></tr>
+  <tr><td>Despliegue</td><td>Railway</td><td>—</td><td>PaaS gratuito, desplegado desde GitHub automáticamente</td></tr>
+  <tr><td>Control de versiones</td><td>Git + GitHub</td><td>—</td><td>Repositorio: mmarcospperezz/kids-routine</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2 class="page-break">3. Arquitectura MVC</h2>
+
+<p>Laravel sigue el patrón <strong>Modelo-Vista-Controlador</strong>:</p>
+<table>
+  <tr><th>Capa</th><th>Ubicación</th><th>Responsabilidad</th></tr>
+  <tr><td><strong>Modelos</strong></td><td><code>app/Models/</code></td><td>Representan las tablas BD + relaciones + lógica de negocio</td></tr>
+  <tr><td><strong>Controladores</strong></td><td><code>app/Http/Controllers/</code></td><td>Reciben la petición HTTP, llaman al modelo, devuelven la vista</td></tr>
+  <tr><td><strong>Vistas</strong></td><td><code>resources/views/</code></td><td>HTML con Blade (plantillas PHP de Laravel)</td></tr>
+  <tr><td><strong>Rutas</strong></td><td><code>routes/web.php</code></td><td>Mapean URL → controlador</td></tr>
+  <tr><td><strong>Middlewares</strong></td><td><code>app/Http/Middleware/</code></td><td>Filtros que se ejecutan antes del controlador (autenticación)</td></tr>
+  <tr><td><strong>Migraciones</strong></td><td><code>database/migrations/</code></td><td>Definen la estructura de la BD en código PHP</td></tr>
+</table>
+
+<h3>Estructura de carpetas relevante</h3>
+<pre>
+kids_routine/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Auth/          → Login, Registro
+│   │   │   ├── Padre/         → Dashboard, Hijo, Tarea, Recompensa, Validacion, Canje
+│   │   │   └── Hijo/          → Sesion (PIN), Dashboard hijo
+│   │   └── Middleware/
+│   │       ├── EsPadre.php    → Comprueba que hay sesión de padre
+│   │       └── EsHijo.php     → Comprueba que hay sesión de hijo en session()
+│   └── Models/
+│       ├── User.php           → tabla: usuarios
+│       ├── Hijo.php           → tabla: hijos
+│       ├── Tarea.php          → tabla: tareas
+│       ├── TareaInstancia.php → tabla: tarea_instancias
+│       ├── Recompensa.php     → tabla: recompensas
+│       ├── Canje.php          → tabla: canjes
+│       └── HistorialMonedas.php → tabla: historial_monedas
+├── database/
+│   ├── migrations/            → 8 migraciones (una por tabla)
+│   └── seeders/DatabaseSeeder.php → datos de demo
+├── resources/views/           → plantillas Blade
+├── routes/web.php             → 39 rutas
+├── bootstrap/app.php          → registro de middlewares
+├── railway.toml               → configuración despliegue
+└── nixpacks.toml              → build en Railway
+</pre>
+
+<!-- ============================================================ -->
+<h2>4. Base de datos</h2>
+
+<h3>Diagrama de entidades</h3>
+<table>
+  <tr><th>Tabla</th><th>PK</th><th>Campos clave</th><th>Relaciones</th></tr>
+  <tr>
+    <td><strong>usuarios</strong></td><td><code>id_usuario</code></td>
+    <td>nombre, email, password_hash, rol</td>
+    <td>1 padre → N hijos, N recompensas</td>
+  </tr>
+  <tr>
+    <td><strong>hijos</strong></td><td><code>id_hijo</code></td>
+    <td>nombre, edad, pin_hash, monedas, monedas_tope, intentos_fallidos, bloqueado_hasta</td>
+    <td>N hijos → 1 padre; 1 hijo → N tareas, canjes, historial</td>
+  </tr>
+  <tr>
+    <td><strong>tareas</strong></td><td><code>id_tarea</code></td>
+    <td>titulo, monedas_recompensa, tipo, recurrencia (DIARIA/SEMANAL/PERSONALIZADA), dias_semana</td>
+    <td>1 tarea → N instancias</td>
+  </tr>
+  <tr>
+    <td><strong>tarea_instancias</strong></td><td><code>id_instancia</code></td>
+    <td>fecha_programada, estado (PENDIENTE/COMPLETADA/VALIDADA/RECHAZADA/CADUCADA), fecha_completada, comentario_padre</td>
+    <td>pertenece a tarea + hijo</td>
+  </tr>
+  <tr>
+    <td><strong>recompensas</strong></td><td><code>id_recompensa</code></td>
+    <td>nombre, monedas_necesarias, activa</td>
+    <td>pertenece a padre; 1 recompensa → N canjes</td>
+  </tr>
+  <tr>
+    <td><strong>canjes</strong></td><td><code>id_canje</code></td>
+    <td>monedas_gastadas, estado (PENDIENTE/APROBADO/ENTREGADO/RECHAZADO), fecha_solicitud</td>
+    <td>pertenece a hijo + recompensa</td>
+  </tr>
+  <tr>
+    <td><strong>historial_monedas</strong></td><td><code>id_historia</code></td>
+    <td>cantidad, saldo_anterior, saldo_posterior, motivo</td>
+    <td>pertenece a hijo (auditoría de cada movimiento)</td>
+  </tr>
+  <tr>
+    <td><strong>auditoria</strong></td><td><code>id_auditoria</code></td>
+    <td>tabla, accion, datos anteriores/nuevos</td>
+    <td>log general del sistema</td>
+  </tr>
+</table>
+
+<div class="callout-yellow callout">
+  <strong>Decisión de diseño:</strong> Las tablas usan nombres en español (<code>usuarios</code>, <code>hijos</code>…) en vez de los convencionales de Laravel (<code>users</code>). Por eso los modelos definen explícitamente <code>$table</code> y <code>$primaryKey</code>. También se desactivan los timestamps automáticos con <code>public $timestamps = false</code> y se gestiona <code>fecha_creacion</code> manualmente donde hace falta.
+</div>
+
+<!-- ============================================================ -->
+<h2 class="page-break">5. Modelos — detalles clave</h2>
+
+<h3>User.php — el padre</h3>
+<pre>
+protected $table = 'usuarios';
+protected $primaryKey = 'id_usuario';
+public $timestamps = false;
+
+// Laravel busca getAuthPassword() para bcrypt — aquí apunta a password_hash
+public function getAuthPassword(): string { return $this->password_hash; }
+
+// Relaciones
+public function hijos()      { return $this->hasMany(Hijo::class, 'id_padre', 'id_usuario'); }
+public function recompensas() { return $this->hasMany(Recompensa::class, 'id_padre', 'id_usuario'); }
+</pre>
+
+<h3>Hijo.php — el niño</h3>
+<pre>
+// Bloqueo temporal por intentos fallidos de PIN
+public function estaBloqueado(): bool {
+    return $this->bloqueado_hasta !== null && now()->lt($this->bloqueado_hasta);
+}
+
+// Avatar emoji determinista basado en id
+public function avatarEmoji(): string {
+    $emojis = ['🐱', '🐶', '🐸', '🦊', '🐼', '🐨', '🦁', '🐯', '🐮', '🐷'];
+    return $emojis[$this->id_hijo % count($emojis)];
+}
+</pre>
+
+<h3>TareaInstancia.php — ciclo de vida de una tarea</h3>
+<p>Cada "ocurrencia" de una tarea es una instancia independiente con su propio estado:</p>
+<table>
+  <tr><th>Estado</th><th>Quién lo cambia</th><th>Significado</th></tr>
+  <tr><td><span class="badge badge-yellow">PENDIENTE</span></td><td>Sistema (al crear)</td><td>Tarea asignada para hoy, sin completar</td></tr>
+  <tr><td><span class="badge">COMPLETADA</span></td><td>El hijo</td><td>El niño dice que la hizo, espera validación del padre</td></tr>
+  <tr><td><span class="badge badge-green">VALIDADA</span></td><td>El padre</td><td>El padre confirma → se suman monedas al hijo</td></tr>
+  <tr><td><span class="badge badge-red">RECHAZADA</span></td><td>El padre</td><td>El padre rechaza (puede poner comentario)</td></tr>
+  <tr><td><span class="badge">CADUCADA</span></td><td>Sistema</td><td>Pasó el día sin completarse</td></tr>
+</table>
+
+<!-- ============================================================ -->
+<h2>6. Autenticación dual</h2>
+
+<h3>Padre — email + contraseña (Laravel Auth)</h3>
+<pre>
+// LoginController.php
+Auth::attempt(['email' => $email, 'password' => $password])
+// Laravel llama internamente a getAuthPassword() del modelo User
+// → devuelve $this->password_hash → bcrypt check automático
+</pre>
+
+<h3>Hijo — PIN de 4 dígitos</h3>
+<pre>
+// SesionController.php
+$hijo = Hijo::find($request->id_hijo);
+
+if ($hijo->estaBloqueado()) → error "bloqueado X minutos"
+
+if (Hash::check($pin, $hijo->pin_hash)) {
+    session(['hijo_id' => $hijo->id_hijo]);   // guarda en sesión PHP
+    return redirect()->route('hijo.dashboard');
+} else {
+    $hijo->increment('intentos_fallidos');
+    if ($hijo->intentos_fallidos >= 3) {
+        $hijo->update(['bloqueado_hasta' => now()->addMinutes(15)]);
+    }
+}
+</pre>
+
+<h3>Middlewares de protección</h3>
+<table>
+  <tr><th>Middleware</th><th>Alias</th><th>Comprueba</th><th>Redirige si falla</th></tr>
+  <tr><td><code>EsPadre</code></td><td><code>padre</code></td><td><code>Auth::check()</code></td><td><code>/login</code></td></tr>
+  <tr><td><code>EsHijo</code></td><td><code>hijo</code></td><td><code>session()->has('hijo_id')</code></td><td><code>/hijo/seleccionar</code></td></tr>
+</table>
+
+<div class="callout">
+  <strong>Doble capa en la sesión del hijo:</strong> El hijo usa la sesión PHP del padre (que está logueado) pero añade <code>hijo_id</code> a esa sesión. Así no necesita su propia cuenta de usuario — solo el padre tiene cuenta.
+</div>
+
+<!-- ============================================================ -->
+<h2 class="page-break">7. Rutas (web.php)</h2>
+
+<table>
+  <tr><th>Prefijo</th><th>Middleware</th><th>Rutas principales</th></tr>
+  <tr>
+    <td><code>/</code></td><td>ninguno</td>
+    <td>GET / (welcome), GET /login, POST /login, GET /registro, POST /registro, POST /logout</td>
+  </tr>
+  <tr>
+    <td><code>/padre</code></td><td><code>padre</code></td>
+    <td>
+      GET /dashboard<br>
+      CRUD /hijos (index, create, store, edit, update, destroy)<br>
+      /tareas (index, create, store, destroy)<br>
+      /recompensas (index, create, store, destroy)<br>
+      GET /validaciones, POST /instancias/{id}/validar, /rechazar<br>
+      GET /canjes, POST /canjes/{id}/aprobar, /rechazar, /entregar
+    </td>
+  </tr>
+  <tr>
+    <td><code>/hijo</code></td><td><code>padre</code></td>
+    <td>GET /seleccionar, POST /pin, POST /verificar-pin, POST /salir</td>
+  </tr>
+  <tr>
+    <td><code>/hijo</code></td><td><code>padre + hijo</code></td>
+    <td>GET /dashboard, POST /tareas/{id}/completar, GET /recompensas, POST /recompensas/{id}/canjear</td>
+  </tr>
+</table>
+
+<p><strong>Total: 39 rutas.</strong> Todas nombradas (ej: <code>padre.hijos.store</code>) para usar <code>route()</code> en vistas.</p>
+
+<!-- ============================================================ -->
+<h2>8. Vistas (Blade)</h2>
+
+<h3>Layouts (plantillas base)</h3>
+<table>
+  <tr><th>Layout</th><th>Usado por</th><th>Contiene</th></tr>
+  <tr><td><code>layouts/guest.blade.php</code></td><td>Login, Registro</td><td>Fondo simple, sin navbar</td></tr>
+  <tr><td><code>layouts/app.blade.php</code></td><td>Panel padre</td><td>Navbar, menú lateral, nombre usuario</td></tr>
+  <tr><td><code>layouts/hijo.blade.php</code></td><td>Panel hijo</td><td>Diseño colorido infantil, nombre hijo, monedas</td></tr>
+</table>
+
+<h3>Árbol de vistas</h3>
+<pre>
+resources/views/
+├── layouts/        → guest, app, hijo
+├── auth/           → login, register
+├── padre/
+│   ├── dashboard.blade.php       → resumen general del padre
+│   ├── hijos/                    → index, create, edit
+│   ├── tareas/                   → index, create
+│   ├── recompensas/              → index, create
+│   ├── validaciones.blade.php    → lista de tareas pendientes de validar
+│   └── canjes.blade.php          → lista de solicitudes de recompensa
+├── hijo/
+│   ├── seleccionar.blade.php     → elige qué hijo entra
+│   ├── pin.blade.php             → introduce PIN
+│   ├── dashboard.blade.php       → tareas de hoy + monedas
+│   └── recompensas.blade.php     → tienda de recompensas
+└── welcome.blade.php             → página de inicio pública
+</pre>
+
+<h3>Blade — sintaxis básica</h3>
+<pre>
+@extends('layouts.app')           ← hereda layout
+@section('content') ... @endsection  ← define sección
+
+{{ $variable }}                   ← imprimir con escape HTML
+{!! $html !!}                     ← imprimir sin escape (HTML raw)
+@foreach ($hijos as $hijo) ... @endforeach
+@if ($hijo->estaBloqueado()) ... @endif
+route('padre.hijos.store')        ← genera la URL de la ruta nombrada
+</pre>
+
+<!-- ============================================================ -->
+<h2 class="page-break">9. Sistema de monedas</h2>
+
+<p>Las monedas son el núcleo gamificado de la app. Flujo completo:</p>
+
+<table>
+  <tr><th>Acción</th><th>Efecto en monedas</th><th>Registro en historial_monedas</th></tr>
+  <tr>
+    <td>Padre valida tarea</td>
+    <td><code>hijo.monedas += tarea.monedas_recompensa</code></td>
+    <td>Sí — motivo "TAREA_VALIDADA"</td>
+  </tr>
+  <tr>
+    <td>Padre rechaza tarea</td>
+    <td>Sin cambio</td>
+    <td>No</td>
+  </tr>
+  <tr>
+    <td>Hijo solicita canje</td>
+    <td><code>hijo.monedas -= recompensa.monedas_necesarias</code><br>(en reserva hasta resolución)</td>
+    <td>Sí — motivo "CANJE_SOLICITADO"</td>
+  </tr>
+  <tr>
+    <td>Padre rechaza canje</td>
+    <td>Se devuelven las monedas</td>
+    <td>Sí — motivo "CANJE_RECHAZADO"</td>
+  </tr>
+  <tr>
+    <td>Padre entrega canje</td>
+    <td>Monedas ya descontadas, queda como definitivo</td>
+    <td>Sí — motivo "CANJE_ENTREGADO"</td>
+  </tr>
+</table>
+
+<div class="callout-green callout">
+  <strong>Auditoría completa:</strong> Cada cambio de monedas guarda saldo_anterior y saldo_posterior en historial_monedas, lo que permite reconstruir el historial completo de un niño en cualquier momento.
+</div>
+
+<!-- ============================================================ -->
+<h2>10. Despliegue en Railway</h2>
+
+<h3>Infraestructura</h3>
+<table>
+  <tr><th>Componente</th><th>Servicio Railway</th><th>Detalle</th></tr>
+  <tr><td>App Laravel</td><td>kids-routine</td><td>Deploy automático desde GitHub (rama main)</td></tr>
+  <tr><td>Base de datos</td><td>MySQL</td><td>Volumen persistente, variables de entorno inyectadas</td></tr>
+</table>
+
+<h3>Variables de entorno en Railway (servicio kids-routine)</h3>
+<table>
+  <tr><th>Variable</th><th>Valor</th></tr>
+  <tr><td><code>APP_ENV</code></td><td>production</td></tr>
+  <tr><td><code>APP_KEY</code></td><td>base64:... (generado con artisan key:generate)</td></tr>
+  <tr><td><code>APP_URL</code></td><td>https://kids-routine-production.up.railway.app</td></tr>
+  <tr><td><code>DB_CONNECTION</code></td><td>mysql</td></tr>
+  <tr><td><code>DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD</code></td><td>Copiadas del servicio MySQL</td></tr>
+  <tr><td><code>PORT</code></td><td>8000</td></tr>
+</table>
+
+<h3>nixpacks.toml — build sin npm</h3>
+<pre>
+[phases.build]
+cmds = []     # ← vacío: salta npm build (assets ya pre-compilados y commiteados)
+
+[start]
+cmd = "php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
+</pre>
+
+<div class="callout-yellow callout">
+  <strong>¿Por qué pre-compilar los assets?</strong> Vite 8 requiere Node 22+, pero Railway usa Node 20. Solución: compilar localmente con <code>npm run build</code>, commitear la carpeta <code>public/build/</code> y saltar el build en Railway con <code>cmds = []</code>.
+</div>
+
+<h3>Proceso de deploy</h3>
+<ol>
+  <li>Se hace <code>git push</code> al repositorio de GitHub</li>
+  <li>Railway detecta el push automáticamente</li>
+  <li>Nixpacks instala dependencias de Composer (<code>vendor/</code>)</li>
+  <li>Se ejecuta el start command: caché de config → caché de rutas → migraciones → servidor</li>
+  <li>Railway asigna el dominio público y redirige el tráfico</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 class="page-break">11. Preguntas frecuentes en la defensa</h2>
+
+<h3>¿Por qué Laravel y no otro framework?</h3>
+<p>Laravel es el framework PHP más usado en España y el sector. Ofrece ORM (Eloquent), sistema de migraciones, autenticación, y una comunidad enorme. Para un TFG de DAW es la elección natural en backend PHP.</p>
+
+<h3>¿Qué es Eloquent ORM?</h3>
+<p>Es el ORM de Laravel. Mapea tablas de BD a clases PHP. En vez de escribir SQL directamente, usas métodos: <code>Hijo::where('id_padre', $id)->get()</code>. Cada fila es un objeto PHP.</p>
+
+<h3>¿Qué es una migración?</h3>
+<p>Un archivo PHP que define la estructura de una tabla BD. Al ejecutar <code>php artisan migrate</code>, Laravel crea/actualiza las tablas. Permite versionar la BD igual que el código.</p>
+
+<h3>¿Cómo funciona el middleware?</h3>
+<p>Es un filtro que se ejecuta antes de que llegue la petición al controlador. <code>EsPadre</code> comprueba que hay sesión activa de Laravel; si no, redirige al login. <code>EsHijo</code> comprueba que hay un <code>hijo_id</code> en la sesión PHP.</p>
+
+<h3>¿Por qué PIN en vez de contraseña para los niños?</h3>
+<p>Los niños de 6-10 años no recuerdan contraseñas alfanuméricas. Un PIN de 4 dígitos es intuitivo, y se añade bloqueo temporal (15 min) tras 3 intentos fallidos para mantener la seguridad.</p>
+
+<h3>¿Qué es Tailwind CSS?</h3>
+<p>Framework CSS "utility-first". En vez de definir clases semánticas (.boton-azul), aplicas clases de utilidad directamente en el HTML: <code>class="bg-blue-500 text-white px-4 py-2 rounded"</code>. Más rápido para protipar, sin ficheros CSS propios.</p>
+
+<h3>¿Cómo se despliega automáticamente?</h3>
+<p>Railway está conectado a GitHub. Cada <code>git push</code> a la rama main dispara un nuevo deployment automático. No hay FTP ni servidores que configurar manualmente.</p>
+
+<h3>¿Qué es una TareaInstancia vs una Tarea?</h3>
+<p><strong>Tarea</strong> = plantilla (ej: "Hacer la cama, todos los días, 5 monedas"). <strong>TareaInstancia</strong> = ocurrencia concreta de esa tarea en un día específico, con su propio estado (pendiente/completada/validada). Una tarea genera una instancia nueva cada día/semana.</p>
+
+<h3>¿Por qué historial_monedas?</h3>
+<p>Para auditoría y trazabilidad. Si un niño dice "me robaron monedas", el padre puede ver exactamente cuándo y por qué subió o bajó el saldo. Buena práctica en cualquier sistema financiero, aunque sea de juguete.</p>
+
+<h3>¿Qué problemas encontraste en el desarrollo?</h3>
+<ul>
+  <li><strong>Nombres de tablas no estándar:</strong> Las tablas están en español, Laravel espera inglés en plural. Solución: definir <code>$table</code> y <code>$primaryKey</code> en cada modelo.</li>
+  <li><strong>Compatibilidad Node.js en Railway:</strong> Vite 8 requiere Node 22+, Railway tenía Node 20. Solución: pre-compilar assets localmente y saltarse el build remoto.</li>
+  <li><strong>PIN vs Auth de Laravel:</strong> Laravel Auth está pensado para email+contraseña. El PIN del hijo usa Hash::check() manualmente con gestión de bloqueo propia.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2>12. Datos de demo para la presentación</h2>
+
+<div class="callout-green callout">
+  <strong>URL:</strong> https://kids-routine-production.up.railway.app
+</div>
+
+<table>
+  <tr><th>Rol</th><th>Credenciales</th></tr>
+  <tr><td>Padre</td><td>Email: <code>demo@kidsroutine.com</code> · Contraseña: <code>demo123</code></td></tr>
+  <tr><td>Sofía (8 años)</td><td>PIN: <code>1234</code> · 30 monedas · Tareas: hacer la cama, estudiar, ordenar habitación</td></tr>
+  <tr><td>Pablo (6 años)</td><td>PIN: <code>5678</code> · 15 monedas · Tareas: lavarse los dientes, recoger juguetes</td></tr>
+</table>
+
+<h3>Flujo para demostrar en la defensa</h3>
+<ol>
+  <li>Abrir la URL, mostrar página de inicio</li>
+  <li>Registrarse o login como padre demo</li>
+  <li>Mostrar panel padre: hijos, tareas, recompensas</li>
+  <li>Entrar como hijo (seleccionar Sofía → PIN 1234)</li>
+  <li>Marcar una tarea como completada</li>
+  <li>Volver como padre → Validaciones → Validar la tarea</li>
+  <li>Entrar de nuevo como hijo → ver monedas aumentadas</li>
+  <li>Canjear una recompensa en la tienda</li>
+  <li>Como padre → Canjes → Aprobar → Entregar</li>
+</ol>
+
+<hr>
+<p style="text-align:center; color:#9ca3af; font-size:9pt;">Kids Routine · TFG DAW · Marcos Pérez · 2026</p>
+
+</body>
+</html>
