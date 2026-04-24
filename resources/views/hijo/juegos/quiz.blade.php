@@ -1,4 +1,4 @@
-@extends('layouts.hijo')
+﻿@extends('layouts.hijo')
 @section('title', 'Quiz de Conocimiento')
 
 @section('content')
@@ -6,7 +6,7 @@
     <a href="{{ route('hijo.juegos') }}" class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition">←</a>
     <div>
         <h2 class="font-extrabold text-white text-lg leading-tight">🧠 Quiz de Conocimiento</h2>
-        <p class="text-white/70 text-xs">Acierta 6 de 8 preguntas · gana 🪙{{ $monedas }} monedas</p>
+        <p class="text-white/70 text-xs">Acierta 6 de 8 preguntas · gana <x-moneda />{{ $monedas }} monedas</p>
     </div>
 </div>
 
@@ -37,7 +37,7 @@
         <h3 class="text-2xl font-extrabold text-gray-800 mb-1">¡Eres muy listo!</h3>
         <p class="text-slate-500 mb-2">Acertaste <span id="puntajeW" class="text-emerald-600 font-extrabold"></span> de 8 preguntas</p>
         <div class="bg-amber-50 border border-amber-100 rounded-2xl px-5 py-3 inline-flex items-center gap-2 mb-4">
-            <span class="text-2xl">🪙</span>
+            <span class="text-2xl"><x-moneda /></span>
             <span class="font-extrabold text-amber-700 text-xl">+{{ $monedas }} monedas</span>
         </div>
         <form id="winForm" action="{{ route('hijo.juegos.completar', 'quiz') }}" method="POST">@csrf</form>

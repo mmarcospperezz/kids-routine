@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Editar hijo')
 
@@ -22,7 +22,7 @@
         @endif
         <div>
             <h1 class="text-2xl font-extrabold text-gray-900">Editar: {{ $hijo->nombre }}</h1>
-            <p class="text-slate-500 text-sm">{{ $hijo->edad }} años · 🪙 {{ $hijo->monedas }} monedas</p>
+            <p class="text-slate-500 text-sm">{{ $hijo->edad }} años · <x-moneda /> {{ $hijo->monedas }} monedas</p>
         </div>
     </div>
 
@@ -45,7 +45,7 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Monedas actuales 🪙</label>
+                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Monedas actuales <x-moneda /></label>
                 <input type="number" name="monedas" value="{{ old('monedas', $hijo->monedas) }}" required min="0"
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                 <p class="text-slate-400 text-xs mt-1.5">💡 Puedes ajustar el saldo manualmente si es necesario</p>

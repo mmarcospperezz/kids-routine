@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +98,7 @@
                                 <p class="font-extrabold text-gray-800 text-xl leading-tight">{{ $hijo->nombre }}</p>
                                 <p class="text-gray-500 text-sm mt-0.5">{{ $hijo->edad }} años</p>
                                 <div class="flex items-center gap-1 mt-1">
-                                    <span class="text-base">🪙</span>
+                                    <span class="text-base"><x-moneda /></span>
                                     <span class="font-bold text-yellow-600 text-sm">{{ $hijo->monedas }} monedas</span>
                                 </div>
                             </div>

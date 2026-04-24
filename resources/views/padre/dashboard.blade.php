@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Inicio')
 
@@ -120,7 +120,7 @@
                             <p class="text-xs text-slate-500">{{ $hijo->edad }} años</p>
                         </div>
                         <div class="flex items-center gap-1 text-yellow-600 font-extrabold text-sm">
-                            <span>🪙</span>
+                            <span><x-moneda /></span>
                             <span>{{ $hijo->monedas }}</span>
                         </div>
                     </div>

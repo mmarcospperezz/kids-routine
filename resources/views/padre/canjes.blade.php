@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Canjes')
 
@@ -37,7 +37,7 @@
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
                                 <span class="flex items-center gap-1 bg-amber-100 text-amber-700 font-extrabold px-2.5 py-1 rounded-full text-xs">
-                                    🪙 {{ $canje->monedas_gastadas }}
+                                    <x-moneda /> {{ $canje->monedas_gastadas }}
                                 </span>
                                 <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ $canje->estadoColor() }}">
                                     {{ $canje->estado }}

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -115,12 +115,12 @@
             <div class="grid md:grid-cols-3 gap-8">
                 @foreach([
                     ['📋', 'from-indigo-100 to-blue-50', '1. Crea tareas', 'Define tareas diarias, semanales o puntuales para cada hijo con su recompensa en monedas.'],
-                    ['🪙', 'from-amber-100 to-yellow-50', '2. Gana monedas', 'El hijo completa tareas y acumula monedas. Tú las validas desde tu panel en segundos.'],
+                    ['<svg viewBox="0 0 20 20" style="width:1em;height:1em" fill="none"><circle cx="10" cy="10" r="9" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/><circle cx="10" cy="10" r="6.5" fill="#FCD34D"/><text x="10" y="14.2" text-anchor="middle" font-size="9" font-weight="900" fill="#92400E" font-family="sans-serif">★</text></svg>', 'from-amber-100 to-yellow-50', '2. Gana monedas', 'El hijo completa tareas y acumula monedas. Tú las validas desde tu panel en segundos.'],
                     ['🎁', 'from-pink-100 to-rose-50', '3. Elige premios', 'Con las monedas ganadas, los niños pueden canjear las recompensas que tú hayas definido.'],
                 ] as [$icon, $bg, $title, $desc])
                     <div class="step-card text-center bg-gradient-to-br {{ $bg }} rounded-3xl p-8 shadow-sm border border-white">
                         <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl mx-auto mb-5 shadow-md">
-                            {{ $icon }}
+                            {!! $icon !!}
                         </div>
                         <h3 class="text-xl font-extrabold text-gray-800 mb-3">{{ $title }}</h3>
                         <p class="text-slate-600 leading-relaxed">{{ $desc }}</p>

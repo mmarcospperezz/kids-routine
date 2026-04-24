@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Mis hijos')
 
@@ -56,7 +56,7 @@
 
                     <!-- Monedas -->
                     <div class="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 mt-3 mb-4">
-                        <span class="text-xl">🪙</span>
+                        <span class="text-xl"><x-moneda /></span>
                         <span class="font-extrabold text-amber-700 text-base">{{ $hijo->monedas }}</span>
                         <span class="text-amber-600 text-xs">monedas</span>
                         @if($hijo->monedas_tope)

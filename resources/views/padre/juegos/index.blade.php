@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Configurar Juegos')
 
@@ -59,7 +59,7 @@
                         Monedas por partida
                     </label>
                     <div class="flex items-center gap-2">
-                        <span class="text-lg">🪙</span>
+                        <span class="text-lg"><x-moneda /></span>
                         <input type="number"
                                name="juegos[{{ $slug }}][monedas_por_partida]"
                                value="{{ $monedas }}"

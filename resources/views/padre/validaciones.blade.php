@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Validaciones')
 
@@ -40,7 +40,7 @@
                                 </p>
                             </div>
                             <div class="flex items-center gap-1 bg-amber-100 text-amber-700 font-extrabold px-3 py-1 rounded-full text-sm flex-shrink-0">
-                                <span>🪙</span>
+                                <span><x-moneda /></span>
                                 <span>+{{ $instancia->tarea->monedas_recompensa }}</span>
                             </div>
                         </div>

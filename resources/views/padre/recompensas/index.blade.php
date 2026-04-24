@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Recompensas')
 
@@ -35,7 +35,7 @@
                         🎁
                     </div>
                     <div class="flex items-center gap-1 bg-amber-100 text-amber-700 font-extrabold px-3 py-1.5 rounded-full text-sm shadow-sm">
-                        <span>🪙</span>
+                        <span><x-moneda /></span>
                         <span>{{ $recompensa->monedas_necesarias }}</span>
                     </div>
                 </div>

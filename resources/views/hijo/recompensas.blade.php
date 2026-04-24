@@ -1,4 +1,4 @@
-@extends('layouts.hijo')
+﻿@extends('layouts.hijo')
 
 @section('title', 'Tienda de recompensas')
 
@@ -10,7 +10,7 @@
         <div>
             <p class="text-white/75 text-sm font-medium">Tus monedas</p>
             <div class="flex items-center gap-2 mt-1">
-                <span class="sparkle text-3xl">🪙</span>
+                <span class="sparkle text-3xl"><x-moneda /></span>
                 <span class="text-4xl font-extrabold text-white">{{ $hijo->monedas }}</span>
             </div>
         </div>
@@ -34,7 +34,7 @@
                     <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-2xl flex-shrink-0">🎁</div>
                     <div class="flex-1 min-w-0">
                         <p class="font-bold text-gray-800 text-sm truncate">{{ $canje->recompensa->nombre }}</p>
-                        <p class="text-xs text-gray-500">🪙 {{ $canje->monedas_gastadas }}</p>
+                        <p class="text-xs text-gray-500"><x-moneda /> {{ $canje->monedas_gastadas }}</p>
                     </div>
                     <span class="text-xs font-bold px-3 py-1.5 rounded-full {{ $canje->estadoColor() }} whitespace-nowrap">
                         {{ $canje->estado === 'PENDIENTE' ? '⏳ Esperando' : '✅ ¡Aprobado!' }}
@@ -71,7 +71,7 @@
 
                 <!-- Precio -->
                 <div class="flex items-center justify-center gap-1 mb-3">
-                    <span class="text-base">🪙</span>
+                    <span class="text-base"><x-moneda /></span>
                     <span class="font-extrabold text-yellow-600 text-base">{{ $recompensa->monedas_necesarias }}</span>
                 </div>
 
@@ -88,7 +88,7 @@
                 @else
                     @php $faltan = $recompensa->monedas_necesarias - $hijo->monedas; @endphp
                     <div class="w-full bg-gray-100 text-gray-400 text-xs font-bold py-2.5 rounded-xl text-center">
-                        Faltan {{ $faltan }} 🪙
+                        Faltan {{ $faltan }} <x-moneda />
                     </div>
                 @endif
             </div>

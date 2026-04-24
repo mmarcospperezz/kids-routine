@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Nueva tarea')
 
@@ -52,7 +52,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Monedas de recompensa *</label>
                 <div class="flex items-center gap-3">
-                    <span class="text-2xl">🪙</span>
+                    <span class="text-2xl"><x-moneda /></span>
                     <input type="number" name="monedas_recompensa" value="{{ old('monedas_recompensa', 5) }}" required min="0" max="9999"
                            class="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                 </div>

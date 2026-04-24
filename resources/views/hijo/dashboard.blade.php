@@ -1,4 +1,4 @@
-@extends('layouts.hijo')
+﻿@extends('layouts.hijo')
 
 @section('title', 'Mis tareas')
 
@@ -74,7 +74,7 @@
                             <p class="font-bold text-gray-800 text-sm leading-tight">{{ $instancia->tarea->titulo }}</p>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-xs font-semibold text-yellow-600 flex items-center gap-0.5">
-                                    🪙 {{ $instancia->tarea->monedas_recompensa }}
+                                    <x-moneda /> {{ $instancia->tarea->monedas_recompensa }}
                                 </span>
                                 @if($instancia->comentario_padre && $estado === 'RECHAZADA')
                                     <span class="text-xs text-red-500">· {{ $instancia->comentario_padre }}</span>
@@ -121,7 +121,7 @@
                     <div class="w-11 h-11 rounded-xl bg-pink-100 flex items-center justify-center text-2xl flex-shrink-0">🎁</div>
                     <div class="flex-1">
                         <p class="font-bold text-gray-800 text-sm">{{ $canje->recompensa->nombre }}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">🪙 {{ $canje->monedas_gastadas }} monedas</p>
+                        <p class="text-xs text-gray-500 mt-0.5"><x-moneda /> {{ $canje->monedas_gastadas }} monedas</p>
                     </div>
                     <span class="text-xs font-bold px-3 py-1.5 rounded-full {{ $canje->estadoColor() }}">
                         {{ $canje->estado === 'PENDIENTE' ? '⏳ Esperando' : '✅ ¡Aprobado!' }}

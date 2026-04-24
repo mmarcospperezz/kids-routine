@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -98,7 +98,7 @@
                 <!-- Monedas + salir -->
                 <div class="flex items-center gap-2">
                     <div class="bg-yellow-400 rounded-2xl px-3 py-2 flex items-center gap-1.5 shadow-lg border-2 border-yellow-300">
-                        <span class="sparkle text-xl">🪙</span>
+                        <span class="sparkle text-xl"><x-moneda /></span>
                         <span class="font-extrabold text-yellow-900 text-lg leading-none">{{ $hijo->monedas }}</span>
                     </div>
                     <form action="{{ route('hijo.salir') }}" method="POST">

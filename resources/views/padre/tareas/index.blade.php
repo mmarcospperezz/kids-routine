@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Tareas')
 
@@ -71,7 +71,7 @@
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-1 bg-amber-50 text-amber-700 font-extrabold px-2.5 py-1 rounded-full text-xs flex-shrink-0">
-                                    <span>🪙</span>
+                                    <span><x-moneda /></span>
                                     <span>{{ $tarea->monedas_recompensa }}</span>
                                 </div>
                                 <form action="{{ route('padre.tareas.destroy', $tarea) }}" method="POST"

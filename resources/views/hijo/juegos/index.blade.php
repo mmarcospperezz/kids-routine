@@ -1,4 +1,4 @@
-@extends('layouts.hijo')
+﻿@extends('layouts.hijo')
 
 @section('title', 'Juegos')
 
@@ -44,7 +44,7 @@
                     <div class="flex items-center gap-3 mt-2">
                         <!-- Monedas -->
                         <div class="flex items-center gap-1 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1">
-                            <span class="text-sm">🪙</span>
+                            <span class="text-sm"><x-moneda /></span>
                             <span class="text-xs font-extrabold text-amber-700">+{{ $monedas }}</span>
                         </div>
                         <!-- Partidas restantes -->
