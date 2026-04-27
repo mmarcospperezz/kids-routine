@@ -47,9 +47,4 @@
     ¿No tienes cuenta?
     <a href="{{ route('register') }}" class="text-indigo-600 hover:text-purple-600 font-bold transition">Regístrate gratis</a>
 </p>
-
-<div class="mt-4 p-3.5 bg-indigo-50 rounded-2xl border border-indigo-100">
-    <p class="text-xs text-indigo-600 font-semibold">🧪 Cuenta demo:</p>
-    <p class="text-xs text-indigo-500 mt-0.5">demo@kidsroutine.com · demo123</p>
-</div>
 @endsection
