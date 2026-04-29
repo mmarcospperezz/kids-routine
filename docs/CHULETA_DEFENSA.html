@@ -168,6 +168,16 @@ kids_routine/
     <td>tabla, accion, datos anteriores/nuevos</td>
     <td>log general del sistema</td>
   </tr>
+  <tr>
+    <td><strong>configuracion_juegos</strong></td><td><code>id</code></td>
+    <td>id_padre, juego (varchar 50), monedas_por_partida (default 5), activo (boolean)</td>
+    <td>Configuración del padre para cada juego. UNIQUE (id_padre, juego)</td>
+  </tr>
+  <tr>
+    <td><strong>partidas</strong></td><td><code>id</code></td>
+    <td>id_hijo, juego, monedas_ganadas, created_at</td>
+    <td>Historial de partidas ganadas; se filtra por fecha para el límite diario</td>
+  </tr>
 </table>
 
 <div class="callout-yellow callout">
@@ -198,12 +208,19 @@ public function estaBloqueado(): bool {
     return $this->bloqueado_hasta !== null && now()->lt($this->bloqueado_hasta);
 }
 
-// Avatar emoji determinista basado en id
-public function avatarEmoji(): string {
-    $emojis = ['🐱', '🐶', '🐸', '🦊', '🐼', '🐨', '🦁', '🐯', '🐮', '🐷'];
-    return $emojis[$this->id_hijo % count($emojis)];
+// Foto de perfil: devuelve URL pública o null si no tiene foto
+public function avatarUrl(): ?string {
+    return $this->avatar ? Storage::url($this->avatar) : null;
+}
+
+// Color de fondo determinista cuando no hay foto (basado en id_hijo)
+public function avatarColor(): string {
+    $colores = ['linear-gradient(135deg,#6366f1,#8b5cf6)',
+                'linear-gradient(135deg,#ec4899,#f97316)', …];
+    return $colores[$this->id_hijo % count($colores)];
 }
 </pre>
+<p>En la vista se usa el patrón: <code>@if($hijo->avatarUrl()) &lt;img src="{{ $hijo->avatarUrl() }}"&gt; @else &lt;div style="background:{{ $hijo->avatarColor() }}"&gt;inicial&lt;/div&gt; @endif</code></p>
 
 <h3>TareaInstancia.php — ciclo de vida de una tarea</h3>
 <p>Cada "ocurrencia" de una tarea es una instancia independiente con su propio estado:</p>
@@ -282,11 +299,16 @@ if (Hash::check($pin, $hijo->pin_hash)) {
   </tr>
   <tr>
     <td><code>/hijo</code></td><td><code>padre + hijo</code></td>
-    <td>GET /dashboard, POST /tareas/{id}/completar, GET /recompensas, POST /recompensas/{id}/canjear</td>
+    <td>GET /dashboard, POST /tareas/{id}/completar, GET /recompensas, POST /recompensas/{id}/canjear<br>
+        GET /juegos, GET /juegos/{juego}, POST /juegos/{juego}/completar</td>
+  </tr>
+  <tr>
+    <td><code>/padre/juegos</code></td><td><code>padre</code></td>
+    <td>GET /juegos (configuración), POST /juegos (guardar monedas y activo por juego)</td>
   </tr>
 </table>
 
-<p><strong>Total: 39 rutas.</strong> Todas nombradas (ej: <code>padre.hijos.store</code>) para usar <code>route()</code> en vistas.</p>
+<p><strong>Total: ~45 rutas.</strong> Todas nombradas (ej: <code>padre.hijos.store</code>, <code>hijo.juegos.completar</code>) para usar <code>route()</code> en vistas.</p>
 
 <!-- ============================================================ -->
 <h2>8. Vistas (Blade)</h2>
@@ -303,6 +325,8 @@ if (Hash::check($pin, $hijo->pin_hash)) {
 <pre>
 resources/views/
 ├── layouts/        → guest, app, hijo
+├── components/
+│   └── moneda.blade.php          → SVG de moneda reutilizable (&lt;x-moneda /&gt;)
 ├── auth/           → login, register
 ├── padre/
 │   ├── dashboard.blade.php       → resumen general del padre
@@ -310,25 +334,35 @@ resources/views/
 │   ├── tareas/                   → index, create
 │   ├── recompensas/              → index, create
 │   ├── validaciones.blade.php    → lista de tareas pendientes de validar
-│   └── canjes.blade.php          → lista de solicitudes de recompensa
+│   ├── canjes.blade.php          → lista de solicitudes de recompensa
+│   └── juegos/index.blade.php    → configuración de juegos (monedas + activo)
 ├── hijo/
 │   ├── seleccionar.blade.php     → elige qué hijo entra
 │   ├── pin.blade.php             → introduce PIN
 │   ├── dashboard.blade.php       → tareas de hoy + monedas
-│   └── recompensas.blade.php     → tienda de recompensas
+│   ├── recompensas.blade.php     → tienda de recompensas
+│   └── juegos/
+│       ├── index.blade.php       → lista de 5 juegos con estado del día
+│       ├── sumas.blade.php       → Operaciones Matemáticas (JS)
+│       ├── memoria.blade.php     → Juego de Memoria (JS)
+│       ├── ahorcado.blade.php    → Adivina la Palabra (JS)
+│       ├── ordenar.blade.php     → Ordena los Números (JS)
+│       └── quiz.blade.php        → Quiz de Conocimiento (JS)
 └── welcome.blade.php             → página de inicio pública
 </pre>
 
 <h3>Blade — sintaxis básica</h3>
 <pre>
-@extends('layouts.app')           ← hereda layout
+@extends('layouts.app')              ← hereda layout
 @section('content') ... @endsection  ← define sección
 
-{{ $variable }}                   ← imprimir con escape HTML
-{!! $html !!}                     ← imprimir sin escape (HTML raw)
+{{ $variable }}                      ← imprimir con escape HTML (previene XSS)
+{!! $html !!}                        ← imprimir sin escape (HTML raw — usar con cuidado)
 @foreach ($hijos as $hijo) ... @endforeach
 @if ($hijo->estaBloqueado()) ... @endif
-route('padre.hijos.store')        ← genera la URL de la ruta nombrada
+route('padre.hijos.store')           ← genera la URL de la ruta nombrada
+
+&lt;x-moneda /&gt;                         ← Blade Component: renderiza components/moneda.blade.php
 </pre>
 
 <!-- ============================================================ -->
@@ -551,11 +585,44 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 <h3>¿Por qué historial_monedas?</h3>
 <p>Para auditoría y trazabilidad. Si un niño dice "me robaron monedas", el padre puede ver exactamente cuándo y por qué subió o bajó el saldo. Buena práctica en cualquier sistema financiero, aunque sea de juguete.</p>
 
+<h3>¿Por qué Blade y no React o Vue?</h3>
+<p>Para este proyecto no hacía falta un frontend reactivo con estado complejo. Blade genera HTML en el servidor, sin bundle JS pesado y sin necesidad de una API REST separada. Los juegos sí usan JavaScript vanilla puro porque requieren interactividad en tiempo real, pero para el resto de la app (listados, formularios, dashboards) el renderizado en servidor es más sencillo, más rápido de desarrollar y más fácil de mantener.</p>
+
+<h3>¿Cómo protege la app contra ataques de seguridad?</h3>
+<table>
+  <tr><th>Ataque</th><th>Protección en Kids Routine</th></tr>
+  <tr><td><strong>CSRF</strong> (Cross-Site Request Forgery)</td><td>Laravel añade automáticamente un token <code>@csrf</code> en cada formulario POST. El middleware <code>VerifyCsrfToken</code> rechaza peticiones sin token válido.</td></tr>
+  <tr><td><strong>XSS</strong> (Cross-Site Scripting)</td><td>Blade escapa todo lo que va entre <code>{{ }}</code> con <code>htmlspecialchars()</code>. Solo se usa <code>{!! !!}</code> cuando el HTML viene de código controlado (nunca de input del usuario).</td></tr>
+  <tr><td><strong>SQL Injection</strong></td><td>Eloquent usa PDO con consultas parametrizadas. Nunca se concatena input del usuario en SQL. Ej: <code>Hijo::where('id_padre', $id)->get()</code> es seguro.</td></tr>
+  <tr><td><strong>Fuerza bruta PIN</strong></td><td>Bloqueo de 15 minutos tras 3 intentos fallidos (<code>bloqueado_hasta</code> en BD).</td></tr>
+  <tr><td><strong>Acceso no autorizado</strong></td><td>Middlewares <code>EsPadre</code> y <code>EsHijo</code> en cada ruta protegida. Un hijo no puede acceder al panel del padre y viceversa.</td></tr>
+</table>
+
+<h3>¿Cómo funciona el sistema de avatares/foto?</h3>
+<p>Tanto el padre como cada hijo pueden subir una foto de perfil. El archivo se guarda en <code>storage/app/public/avatars/</code> (en Railway, en disco efímero — mejora pendiente: S3). El modelo tiene dos métodos: <code>avatarUrl()</code> devuelve la URL pública si hay foto, o <code>null</code>; <code>avatarColor()</code> devuelve un gradiente CSS determinista basado en el <code>id_hijo % total_colores</code> para cuando no hay foto. En las vistas se usa siempre el patrón <code>@if(avatarUrl()) … @else … @endif</code>.</p>
+
+<h3>¿Qué es <code>DB::transaction()</code> y por qué lo usas?</h3>
+<p>Agrupa varias operaciones de BD en una transacción atómica: o se completan todas o no se aplica ninguna. En el módulo de juegos, una partida ganada implica: actualizar monedas del hijo + crear registro en <code>partidas</code> + crear registro en <code>historial_monedas</code>. Sin transacción, si falla el paso 2, el hijo tendría monedas sin registro de auditoría — inconsistencia. Con <code>DB::transaction()</code>, si cualquier paso lanza una excepción, se hace rollback automático de todo.</p>
+
+<h3>¿Has hecho tests automatizados?</h3>
+<p>No se implementaron tests unitarios ni de integración en este TFG, por limitación de tiempo y alcance. Laravel incluye PHPUnit y la clase <code>TestCase</code> para escribirlos. Las pruebas se realizaron manualmente en local con Laragon y en producción con Railway. Como mejora futura, escribiría tests para los flujos críticos: validación de tareas, canje de recompensas y límite diario de juegos.</p>
+
+<h3>¿Qué mejorarías si tuvieras más tiempo?</h3>
+<ul>
+  <li><strong>Almacenamiento de fotos en S3:</strong> ahora los avatares se guardan en disco local (se pierden en cada deploy de Railway).</li>
+  <li><strong>Tests automatizados</strong> con PHPUnit para los flujos críticos.</li>
+  <li><strong>Notificaciones push</strong> cuando el padre valida una tarea (usando Laravel Notifications).</li>
+  <li><strong>App móvil</strong> con una API REST + React Native o Flutter, ya que el target principal son niños con móvil/tablet.</li>
+  <li><strong>Más juegos</strong> y sistema de rachas (streak) para motivar la constancia.</li>
+</ul>
+
 <h3>¿Qué problemas encontraste en el desarrollo?</h3>
 <ul>
   <li><strong>Nombres de tablas no estándar:</strong> Las tablas están en español, Laravel espera inglés en plural. Solución: definir <code>$table</code> y <code>$primaryKey</code> en cada modelo.</li>
   <li><strong>Compatibilidad Node.js en Railway:</strong> Vite 8 requiere Node 22+, Railway tenía Node 20. Solución: pre-compilar assets localmente y saltarse el build remoto.</li>
-  <li><strong>PIN vs Auth de Laravel:</strong> Laravel Auth está pensado para email+contraseña. El PIN del hijo usa Hash::check() manualmente con gestión de bloqueo propia.</li>
+  <li><strong>PIN vs Auth de Laravel:</strong> Laravel Auth está pensado para email+contraseña. El PIN del hijo usa <code>Hash::check()</code> manualmente con gestión de bloqueo propia.</li>
+  <li><strong>Migración DDL en Railway:</strong> MySQL no es transaccional en DDL; una migración fallida a mitad dejaba la tabla creada físicamente pero sin registro en <code>migrations</code>. Al reintentar el deploy fallaba con "table already exists". Solución: <code>Schema::hasTable()</code> + <code>try/catch</code>.</li>
+  <li><strong>Emoji 🪙 no soportado en dispositivos antiguos:</strong> Unicode 13.0 no disponible en algunos sistemas. Solución: Blade component <code>&lt;x-moneda /&gt;</code> con SVG inline.</li>
 </ul>
 
 <!-- ============================================================ -->
@@ -574,16 +641,21 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 
 <h3>Flujo para demostrar en la defensa</h3>
 <ol>
-  <li>Abrir la URL, mostrar página de inicio</li>
-  <li>Registrarse o login como padre demo</li>
-  <li>Mostrar panel padre: hijos, tareas, recompensas</li>
-  <li>Entrar como hijo (seleccionar Sofía → PIN 1234)</li>
+  <li>Abrir la URL → mostrar landing page pública</li>
+  <li>Login como padre demo (<code>demo@kidsroutine.com</code> / <code>demo123</code>)</li>
+  <li>Mostrar panel padre: dashboard con resumen, hijos, tareas, recompensas</li>
+  <li>Mostrar <strong>Juegos → configuración</strong>: cambiar monedas de un juego, activar/desactivar</li>
+  <li>Entrar como hijo: Modo Hijo → Sofía → PIN <code>1234</code></li>
+  <li>Mostrar panel hijo: tareas del día con monedas actuales</li>
   <li>Marcar una tarea como completada</li>
-  <li>Volver como padre → Validaciones → Validar la tarea</li>
-  <li>Entrar de nuevo como hijo → ver monedas aumentadas</li>
-  <li>Canjear una recompensa en la tienda</li>
-  <li>Como padre → Canjes → Aprobar → Entregar</li>
+  <li>Ir a <strong>Juegos</strong> → jugar al Quiz o Sumas → ganar partida → ver monedas sumadas</li>
+  <li>Ir a <strong>Tienda</strong> → canjear una recompensa</li>
+  <li>Volver como padre → <strong>Validaciones</strong> → Validar la tarea completada</li>
+  <li>Como padre → <strong>Canjes</strong> → Aprobar → Entregar</li>
 </ol>
+<div class="callout-yellow callout">
+  <strong>Consejo:</strong> Muestra primero la configuración de juegos desde el padre (paso 4) antes de entrar como hijo, así el tribunal ve la relación padre-configura / hijo-juega.
+</div>
 
 <hr>
 <p style="text-align:center; color:#9ca3af; font-size:9pt;">Kids Routine · TFG DAW · Marcos Pérez · 2026</p>
