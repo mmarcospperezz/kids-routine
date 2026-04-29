@@ -370,7 +370,110 @@ route('padre.hijos.store')        ← genera la URL de la ruta nombrada
 </div>
 
 <!-- ============================================================ -->
-<h2>10. Despliegue en Railway</h2>
+<h2 class="page-break">10. Módulo de Juegos Educativos</h2>
+
+<p>Extensión del sistema de gamificación: el hijo puede ganar monedas extra jugando a 5 juegos educativos en el navegador. El padre configura las monedas por juego; hay un límite de <strong>3 partidas por juego al día</strong>.</p>
+
+<h3>Arquitectura del módulo</h3>
+<table>
+  <tr><th>Archivo</th><th>Responsabilidad</th></tr>
+  <tr><td><code>app/Support/Juegos.php</code></td><td>Clase estática con la constante <code>LIST</code>: array asociativo con los 5 juegos (nombre, icono, dificultad, colores de gradiente)</td></tr>
+  <tr><td><code>app/Http/Controllers/Hijo/JuegoController.php</code></td><td>index (lista de juegos + estado del día), jugar (verifica límite), completar (valida y otorga monedas)</td></tr>
+  <tr><td><code>app/Http/Controllers/Padre/JuegoController.php</code></td><td>index (muestra configuración), guardar (actualiza monedas_por_partida y activo para cada juego)</td></tr>
+  <tr><td><code>resources/views/hijo/juegos/</code></td><td>index.blade.php + 5 vistas de juego (sumas, memoria, ahorcado, ordenar, quiz)</td></tr>
+  <tr><td><code>resources/views/padre/juegos/index.blade.php</code></td><td>Panel del padre: activa/desactiva juegos y fija monedas (1–50) por partida</td></tr>
+</table>
+
+<h3>Tablas de BD añadidas</h3>
+<table>
+  <tr><th>Tabla</th><th>Campos clave</th><th>Para qué sirve</th></tr>
+  <tr>
+    <td><code>configuracion_juegos</code></td>
+    <td><code>id_padre</code>, <code>juego</code> (varchar 50), <code>monedas_por_partida</code> (default 5), <code>activo</code> (boolean)</td>
+    <td>Configuración por padre y por juego. PK compuesta única (<code>id_padre</code>, <code>juego</code>)</td>
+  </tr>
+  <tr>
+    <td><code>partidas</code></td>
+    <td><code>id_hijo</code>, <code>juego</code>, <code>monedas_ganadas</code>, <code>created_at</code></td>
+    <td>Registro de cada partida ganada. Se usa para comprobar el límite diario (<code>whereDate('created_at', today())</code>)</td>
+  </tr>
+</table>
+
+<div class="callout-yellow callout">
+  <strong>ENUM extendido:</strong> La columna <code>historial_monedas.motivo</code> era <code>ENUM('TAREA','ACTIVIDAD','CANJE','AJUSTE_PADRE','BONIFICACION')</code>. Se añadió el valor <code>'JUEGO'</code> mediante <code>ALTER TABLE … MODIFY COLUMN motivo ENUM(…,'JUEGO')</code> en la migración.
+</div>
+
+<h3>Los 5 juegos (client-side JavaScript puro)</h3>
+<table>
+  <tr><th>Clave</th><th>Nombre</th><th>Mecánica</th><th>Dificultad</th></tr>
+  <tr><td><code>sumas</code></td><td>Operaciones Matemáticas</td><td>10 sumas/restas aleatorias, hay que acertar 7 de 10</td><td>Fácil</td></tr>
+  <tr><td><code>memoria</code></td><td>Juego de Memoria</td><td>16 cartas (8 parejas de emojis) — encontrar todas las parejas</td><td>Medio</td></tr>
+  <tr><td><code>ahorcado</code></td><td>Adivina la Palabra</td><td>20 palabras en español con tildes y ñ; 6 errores permitidos; input libre con auto-envío</td><td>Medio</td></tr>
+  <tr><td><code>ordenar</code></td><td>Ordena los Números</td><td>10 fichas desordenadas, tocarlas en orden ascendente</td><td>Fácil</td></tr>
+  <tr><td><code>quiz</code></td><td>Quiz de Conocimiento</td><td>8 preguntas de cultura general, hay que acertar 6 de 8</td><td>Difícil</td></tr>
+</table>
+
+<h3>Flujo técnico completo de una partida</h3>
+<div class="flow">
+  <span class="flow-step">GET /hijo/juegos/{juego}</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Verifica activo + &lt; 3 partidas hoy</span><span class="flow-arrow">→</span>
+  <span class="flow-step">JS ejecuta el juego en el navegador</span><span class="flow-arrow">→</span>
+  <span class="flow-step">JS detecta condición de victoria</span><span class="flow-arrow">→</span>
+  <span class="flow-step">JS hace submit del form oculto</span><span class="flow-arrow">→</span>
+  <span class="flow-step">POST /hijo/juegos/{juego}/completar</span><span class="flow-arrow">→</span>
+  <span class="flow-step">Servidor valida límite + DB::transaction()</span>
+</div>
+
+<h3>Transacción al completar partida — <code>JuegoController@completar</code></h3>
+<pre>
+// 1. Doble comprobación del límite (el JS podría manipularse)
+$partidasHoy = Partida::where('id_hijo', $hijo->id_hijo)
+                       ->where('juego', $juego)
+                       ->whereDate('created_at', today())
+                       ->count();
+if ($partidasHoy >= 3) return redirect()->back();
+
+// 2. Transacción atómica: o todo o nada
+DB::transaction(function () use ($hijo, $config, $juego) {
+    $saldoAnterior = $hijo->monedas;
+    // Respeta el tope máximo de monedas del hijo
+    $nuevoSaldo = min($saldoAnterior + $config->monedas_por_partida, $hijo->monedas_tope);
+    $ganadas    = $nuevoSaldo - $saldoAnterior;
+
+    $hijo->update(['monedas' => $nuevoSaldo]);
+
+    Partida::create(['id_hijo' => $hijo->id_hijo, 'juego' => $juego, 'monedas_ganadas' => $ganadas]);
+
+    HistorialMonedas::create([
+        'id_hijo'         => $hijo->id_hijo,
+        'cantidad'        => $ganadas,
+        'saldo_anterior'  => $saldoAnterior,
+        'saldo_posterior' => $nuevoSaldo,
+        'motivo'          => 'JUEGO',
+    ]);
+});
+</pre>
+
+<div class="callout">
+  <strong>Clave de diseño:</strong> La lógica del juego está 100% en JavaScript del cliente (sin llamadas AJAX intermedias). El servidor solo interviene al inicio (¿puede jugar?) y al final (POST de victoria). Esto mantiene el backend simple y los juegos rápidos y sin latencia.
+</div>
+
+<h3>Decisión técnica: migración idempotente</h3>
+<p>MySQL <strong>no es transaccional en DDL</strong>: si una migración falla a mitad, la tabla queda creada físicamente pero sin registro en la tabla <code>migrations</code>. Al re-ejecutar, el <code>CREATE TABLE</code> falla con "table already exists" y el servidor no arranca. Solución: guardas <code>Schema::hasTable()</code> e inyección del <code>NOT NULL</code> en el <code>ALTER TABLE</code> del ENUM, envuelto en <code>try/catch</code>.</p>
+
+<pre>
+// Idempotente: no falla si se ejecuta dos veces
+if (!Schema::hasTable('configuracion_juegos')) {
+    Schema::create('configuracion_juegos', function (Blueprint $table) { … });
+}
+try {
+    DB::statement("ALTER TABLE historial_monedas MODIFY COLUMN motivo
+        ENUM('TAREA','ACTIVIDAD','CANJE','AJUSTE_PADRE','BONIFICACION','JUEGO') NOT NULL");
+} catch (\Throwable $e) { /* ya estaba añadido — se ignora */ }
+</pre>
+
+<!-- ============================================================ -->
+<h2>11. Despliegue en Railway</h2>
 
 <h3>Infraestructura</h3>
 <table>
@@ -413,7 +516,7 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 </ol>
 
 <!-- ============================================================ -->
-<h2 class="page-break">11. Preguntas frecuentes en la defensa</h2>
+<h2 class="page-break">12. Preguntas frecuentes en la defensa</h2>
 
 <h3>¿Por qué Laravel y no otro framework?</h3>
 <p>Laravel es el framework PHP más usado en España y el sector. Ofrece ORM (Eloquent), sistema de migraciones, autenticación, y una comunidad enorme. Para un TFG de DAW es la elección natural en backend PHP.</p>
@@ -436,6 +539,12 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 <h3>¿Cómo se despliega automáticamente?</h3>
 <p>Railway está conectado a GitHub. Cada <code>git push</code> a la rama main dispara un nuevo deployment automático. No hay FTP ni servidores que configurar manualmente.</p>
 
+<h3>¿Por qué los juegos corren en el cliente (JavaScript) y no en el servidor?</h3>
+<p>Los juegos tienen lógica de interacción en tiempo real (cartas que se voltean, letras que se revelan, temporizadores) que sería imposible de gestionar con peticiones HTTP síncronas al servidor. El servidor solo interviene en dos momentos: al inicio (¿puede jugar hoy?) y al final (POST de victoria). Esta separación mantiene los juegos fluidos y el backend sin estado de juego.</p>
+
+<h3>¿Cómo se evita que un niño envíe el POST de victoria sin jugar realmente?</h3>
+<p>El servidor comprueba el límite de 3 partidas al día con <code>whereDate('created_at', today())</code>. Si un niño envía el POST directamente sin jugar, consumiría uno de sus 3 intentos diarios igualmente. No se valida si "de verdad ganó" — se confía en que el JS del cliente es la fuente de verdad para la condición de victoria, y el límite diario es la protección real.</p>
+
 <h3>¿Qué es una TareaInstancia vs una Tarea?</h3>
 <p><strong>Tarea</strong> = plantilla (ej: "Hacer la cama, todos los días, 5 monedas"). <strong>TareaInstancia</strong> = ocurrencia concreta de esa tarea en un día específico, con su propio estado (pendiente/completada/validada). Una tarea genera una instancia nueva cada día/semana.</p>
 
@@ -450,7 +559,7 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 </ul>
 
 <!-- ============================================================ -->
-<h2>12. Datos de demo para la presentación</h2>
+<h2>13. Datos de demo para la presentación</h2>
 
 <div class="callout-green callout">
   <strong>URL:</strong> https://kids-routine-production.up.railway.app
