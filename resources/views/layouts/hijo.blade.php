@@ -114,9 +114,10 @@
                     <form action="{{ route('hijo.salir') }}" method="POST">
                         @csrf
                         <button type="submit"
-                                class="w-9 h-9 bg-white/20 hover:bg-white/30 rounded-xl flex items-center justify-center text-white transition border border-white/20"
-                                title="Salir">
-                            🔄
+                                class="flex flex-col items-center justify-center bg-white/20 hover:bg-white/30 rounded-xl px-2 py-1 text-white transition border border-white/20 min-w-[44px]"
+                                title="Cerrar Sesión">
+                            <span class="text-base leading-none">🔄</span>
+                            <span class="text-[9px] font-bold leading-tight mt-0.5 opacity-90">Salir</span>
                         </button>
                     </form>
                 </div>
