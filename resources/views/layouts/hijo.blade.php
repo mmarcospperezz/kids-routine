@@ -80,15 +80,25 @@
             <div class="flex items-center justify-between">
                 <!-- Avatar + nombre -->
                 <div class="flex items-center gap-3">
-                    @if($hijo->avatarUrl())
-                        <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
-                             class="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-white/40">
-                    @else
-                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg border border-white/30"
-                             style="background: {{ $hijo->avatarColor() }}">
-                            {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                    <label for="avatarHijoInput" class="cursor-pointer group relative flex-shrink-0" title="Cambiar foto">
+                        @if($hijo->avatarUrl())
+                            <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                                 class="w-14 h-14 rounded-2xl object-cover shadow-lg border-2 border-white/40 group-hover:border-white/80 transition">
+                        @else
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg border border-white/30 group-hover:border-white/70 transition"
+                                 style="background: {{ $hijo->avatarColor() }}">
+                                {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
+                            </div>
+                        @endif
+                        <div class="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="text-white text-lg">📷</span>
                         </div>
-                    @endif
+                    </label>
+                    <form action="{{ route('hijo.perfil.avatar') }}" method="POST" enctype="multipart/form-data" id="avatarHijoForm">
+                        @csrf
+                        <input type="file" id="avatarHijoInput" name="avatar" accept="image/*" class="hidden"
+                               onchange="document.getElementById('avatarHijoForm').submit()">
+                    </form>
                     <div>
                         <p class="font-extrabold text-white text-lg leading-tight">{{ $hijo->nombre }}</p>
                         <p class="text-white/70 text-xs">{{ $hijo->edad }} años 🎂</p>

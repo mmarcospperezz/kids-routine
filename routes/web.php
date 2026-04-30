@@ -13,6 +13,7 @@ use App\Http\Controllers\Padre\JuegoController as PadreJuegoController;
 use App\Http\Controllers\Hijo\SesionController;
 use App\Http\Controllers\Hijo\DashboardController as HijoDashboardController;
 use App\Http\Controllers\Hijo\JuegoController as HijoJuegoController;
+use App\Http\Controllers\Hijo\PerfilController as HijoPerfilController;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
@@ -85,6 +86,9 @@ Route::middleware(['padre', 'hijo'])->prefix('hijo')->name('hijo.')->group(funct
     Route::post('/tareas/{instancia}/completar', [HijoDashboardController::class, 'completarTarea'])->name('tareas.completar');
     Route::get('/recompensas', [HijoDashboardController::class, 'recompensas'])->name('recompensas');
     Route::post('/recompensas/{recompensa}/canjear', [HijoDashboardController::class, 'canjear'])->name('recompensas.canjear');
+
+    // Perfil del hijo
+    Route::post('/perfil/avatar', [HijoPerfilController::class, 'updateAvatar'])->name('perfil.avatar');
 
     // Juegos educativos
     Route::get('/juegos', [HijoJuegoController::class, 'index'])->name('juegos');
