@@ -150,9 +150,9 @@
         @endfor
     </div>
     <div class="flex gap-4 mt-3 text-xs text-slate-500">
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-500 rounded inline-block"></span> Validado</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-400 rounded inline-block"></span> Pendiente</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-500 rounded inline-block"></span> Rechazado</span>
+        <span class="flex items-center gap-1"><span style="width:12px;height:12px;background:#22c55e;border-radius:3px;display:inline-block"></span> Validado</span>
+        <span class="flex items-center gap-1"><span style="width:12px;height:12px;background:#fbbf24;border-radius:3px;display:inline-block"></span> Pendiente</span>
+        <span class="flex items-center gap-1"><span style="width:12px;height:12px;background:#ef4444;border-radius:3px;display:inline-block"></span> Rechazado</span>
     </div>
 </div>
 
