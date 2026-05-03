@@ -12,7 +12,7 @@ class PerfilController extends Controller
     public function updateAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => 'required|image|max:2048',
+            'avatar' => 'required|file|mimes:jpg,jpeg,png,gif,webp,heic,heif|max:10240',
         ]);
 
         $hijo = Hijo::findOrFail(session('hijo_id'));
@@ -25,5 +25,17 @@ class PerfilController extends Controller
         $hijo->update(['avatar' => $nombre]);
 
         return back()->with('exito', '¡Foto actualizada!');
+    }
+
+    public function eliminarAvatar()
+    {
+        $hijo = Hijo::findOrFail(session('hijo_id'));
+
+        if ($hijo->avatar) {
+            Storage::disk('public')->delete('avatars/' . $hijo->avatar);
+            $hijo->update(['avatar' => null]);
+        }
+
+        return back()->with('exito', 'Foto eliminada.');
     }
 }

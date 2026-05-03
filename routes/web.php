@@ -35,6 +35,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/perfil/avatar', [PerfilController::class, 'updateAvatar'])->name('perfil.avatar');
+    Route::delete('/perfil/avatar', [PerfilController::class, 'eliminarAvatar'])->name('perfil.avatar.eliminar');
 
     // Gestión de hijos
     Route::get('/hijos', [HijoController::class, 'index'])->name('hijos.index');
@@ -89,6 +90,7 @@ Route::middleware(['padre', 'hijo'])->prefix('hijo')->name('hijo.')->group(funct
 
     // Perfil del hijo
     Route::post('/perfil/avatar', [HijoPerfilController::class, 'updateAvatar'])->name('perfil.avatar');
+    Route::delete('/perfil/avatar', [HijoPerfilController::class, 'eliminarAvatar'])->name('perfil.avatar.eliminar');
 
     // Juegos educativos
     Route::get('/juegos', [HijoJuegoController::class, 'index'])->name('juegos');

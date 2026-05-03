@@ -96,12 +96,23 @@
                     </label>
                     <form action="{{ route('hijo.perfil.avatar') }}" method="POST" enctype="multipart/form-data" id="avatarHijoForm">
                         @csrf
-                        <input type="file" id="avatarHijoInput" name="avatar" accept="image/*" class="hidden"
+                        <input type="file" id="avatarHijoInput" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" class="hidden"
                                onchange="document.getElementById('avatarHijoForm').submit()">
                     </form>
                     <div>
                         <p class="font-extrabold text-white text-lg leading-tight">{{ $hijo->nombre }}</p>
                         <p class="text-white/70 text-xs">{{ $hijo->edad }} años 🎂</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <label for="avatarHijoInput" class="text-white/60 hover:text-white text-[10px] cursor-pointer transition">
+                                {{ $hijo->avatarUrl() ? '🔄 Cambiar' : '📷 Añadir foto' }}
+                            </label>
+                            @if($hijo->avatarUrl())
+                                <form action="{{ route('hijo.perfil.avatar.eliminar') }}" method="POST" class="inline">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-red-300 hover:text-red-200 text-[10px] transition">✕ Eliminar</button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
                 </div>
 

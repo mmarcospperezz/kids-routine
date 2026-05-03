@@ -68,15 +68,28 @@
                         <span class="text-white text-xs">📷</span>
                     </div>
                 </label>
-                <div class="min-w-0">
+                <div class="min-w-0 flex-1">
                     <div class="text-sm font-semibold truncate">{{ auth()->user()->nombre }}</div>
                     <div class="text-indigo-300 text-xs">Padre / Madre</div>
+                    <!-- Acciones de foto -->
+                    <div class="flex items-center gap-2 mt-1">
+                        <label for="avatarPadreInput" class="text-indigo-300 hover:text-white text-[10px] cursor-pointer transition">
+                            {{ auth()->user()->avatarUrl() ? '🔄 Cambiar' : '📷 Añadir foto' }}
+                        </label>
+                        @if(auth()->user()->avatarUrl())
+                            <form action="{{ route('padre.perfil.avatar.eliminar') }}" method="POST" class="inline">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="text-red-400 hover:text-red-300 text-[10px] transition"
+                                        onclick="return confirm('¿Eliminar foto de perfil?')">✕ Eliminar</button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
             </div>
             <!-- Form oculto para subir avatar -->
             <form action="{{ route('padre.perfil.avatar') }}" method="POST" enctype="multipart/form-data" id="avatarPadreForm">
                 @csrf
-                <input type="file" id="avatarPadreInput" name="avatar" accept="image/*" class="hidden"
+                <input type="file" id="avatarPadreInput" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif" class="hidden"
                        onchange="document.getElementById('avatarPadreForm').submit()">
             </form>
         </div>
