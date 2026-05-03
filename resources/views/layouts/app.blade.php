@@ -30,6 +30,12 @@
             border-color: #6366f1;
             box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
         }
+        /* Scrollbar del sidebar */
+        #sidebar nav::-webkit-scrollbar { width: 4px; }
+        #sidebar nav::-webkit-scrollbar-track { background: transparent; }
+        #sidebar nav::-webkit-scrollbar-thumb { background: rgba(165,180,252,0.25); border-radius: 99px; }
+        #sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(165,180,252,0.5); }
+        #sidebar nav { scrollbar-width: thin; scrollbar-color: rgba(165,180,252,0.25) transparent; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
