@@ -60,10 +60,10 @@ class EstadisticasController extends Controller
         $mesActual = now()->startOfMonth();
         $instanciasMes = TareaInstancia::whereIn('id_hijo', $hijoIds)
             ->whereBetween('fecha_programada', [$mesActual, now()->endOfMonth()])
-            ->selectRaw('fecha_programada, estado, COUNT(*) as n')
-            ->groupBy('fecha_programada', 'estado')
+            ->selectRaw('DATE_FORMAT(fecha_programada, "%Y-%m-%d") as fecha_dia, estado, COUNT(*) as n')
+            ->groupBy('fecha_dia', 'estado')
             ->get()
-            ->groupBy('fecha_programada');
+            ->groupBy('fecha_dia');
 
         return view('padre.estadisticas', compact(
             'hijos', 'monedasSemana', 'tasaCompletado',
