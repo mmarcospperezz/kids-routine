@@ -34,7 +34,11 @@ class User extends Authenticatable
 
     public function avatarUrl(): ?string
     {
-        return $this->avatar ? asset('storage/avatars/' . $this->avatar) : null;
+        if (!$this->avatar) return null;
+        // Base64 guardado en BD (nuevo sistema)
+        if (str_starts_with($this->avatar, 'data:')) return $this->avatar;
+        // Ruta de archivo (sistema antiguo, compatibilidad)
+        return asset('storage/avatars/' . $this->avatar);
     }
 
     public function hijos()

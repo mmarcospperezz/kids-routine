@@ -58,7 +58,9 @@ class Hijo extends Model
 
     public function avatarUrl(): ?string
     {
-        return $this->avatar ? asset('storage/avatars/' . $this->avatar) : null;
+        if (!$this->avatar) return null;
+        if (str_starts_with($this->avatar, 'data:')) return $this->avatar;
+        return asset('storage/avatars/' . $this->avatar);
     }
 
     public function avatarColor(): string

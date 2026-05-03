@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Hijo;
 use App\Http\Controllers\Controller;
 use App\Models\Hijo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class PerfilController extends Controller
 {
@@ -16,26 +16,21 @@ class PerfilController extends Controller
         ]);
 
         $hijo = Hijo::findOrFail(session('hijo_id'));
-
-        if ($hijo->avatar) {
-            Storage::disk('public')->delete('avatars/' . $hijo->avatar);
-        }
-
-        $nombre = basename($request->file('avatar')->store('avatars', 'public'));
-        $hijo->update(['avatar' => $nombre]);
+        $hijo->update(['avatar' => $this->toBase64($request->file('avatar'))]);
 
         return back()->with('exito', '¡Foto actualizada!');
     }
 
     public function eliminarAvatar()
     {
-        $hijo = Hijo::findOrFail(session('hijo_id'));
-
-        if ($hijo->avatar) {
-            Storage::disk('public')->delete('avatars/' . $hijo->avatar);
-            $hijo->update(['avatar' => null]);
-        }
-
+        Hijo::findOrFail(session('hijo_id'))->update(['avatar' => null]);
         return back()->with('exito', 'Foto eliminada.');
+    }
+
+    private function toBase64($file): string
+    {
+        $img = Image::read($file)->cover(300, 300);
+        $encoded = $img->toWebp(80);
+        return 'data:image/webp;base64,' . base64_encode($encoded);
     }
 }
