@@ -29,7 +29,7 @@ return new class extends Migration
         // ─── Tareas: franja horaria y categoría ───────────────────────────────
         if (!Schema::hasColumn('tareas', 'franja')) {
             Schema::table('tareas', function (Blueprint $table) {
-                $table->enum('franja', ['CUALQUIERA', 'MAÑANA', 'TARDE', 'NOCHE'])
+                $table->enum('franja', ['CUALQUIERA', 'MANANA', 'TARDE', 'NOCHE'])
                       ->default('CUALQUIERA')->after('dias_semana');
                 $table->string('categoria', 60)->nullable()->after('franja');
             });

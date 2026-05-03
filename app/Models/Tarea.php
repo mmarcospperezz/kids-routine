@@ -50,7 +50,7 @@ class Tarea extends Model
     public function franjaLabel(): string
     {
         return match ($this->franja) {
-            'MAÑANA' => '🌅 Mañana',
+            'MANANA' => '🌅 Mañana',
             'TARDE'  => '☀️ Tarde',
             'NOCHE'  => '🌙 Noche',
             default  => '',

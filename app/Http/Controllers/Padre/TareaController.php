@@ -36,7 +36,7 @@ class TareaController extends Controller
             'recurrencia'        => 'required_if:tipo,RECURRENTE|nullable|in:DIARIA,SEMANAL,PERSONALIZADA',
             'dias_semana'        => 'required_if:recurrencia,PERSONALIZADA|nullable',
             'fecha_fin'          => 'nullable|date|after:today',
-            'franja'             => 'nullable|in:CUALQUIERA,MAÑANA,TARDE,NOCHE',
+            'franja'             => 'nullable|in:CUALQUIERA,MANANA,TARDE,NOCHE',
             'categoria'          => 'nullable|string|max:60',
         ]);
 

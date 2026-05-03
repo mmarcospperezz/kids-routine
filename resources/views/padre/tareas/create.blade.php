@@ -105,7 +105,7 @@
                     <select name="franja"
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                         <option value="CUALQUIERA" {{ old('franja', 'CUALQUIERA') == 'CUALQUIERA' ? 'selected' : '' }}>🕐 Cualquier hora</option>
-                        <option value="MAÑANA"     {{ old('franja') == 'MAÑANA' ? 'selected' : '' }}>🌅 Mañana</option>
+                        <option value="MANANA"     {{ old('franja') == 'MANANA' ? 'selected' : '' }}>🌅 Mañana</option>
                         <option value="TARDE"      {{ old('franja') == 'TARDE' ? 'selected' : '' }}>☀️ Tarde</option>
                         <option value="NOCHE"      {{ old('franja') == 'NOCHE' ? 'selected' : '' }}>🌙 Noche</option>
                     </select>
