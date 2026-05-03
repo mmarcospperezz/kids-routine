@@ -40,9 +40,19 @@
                     </div>
                 </div>
 
-                <h3 class="font-extrabold text-gray-800 text-base mb-1 flex-1">{{ $recompensa->nombre }}</h3>
+                <h3 class="font-extrabold text-gray-800 text-base mb-1">{{ $recompensa->nombre }}</h3>
+                <div class="flex gap-1.5 mb-2 flex-wrap">
+                    @if(($recompensa->tipo ?? 'FISICA') === 'VIRTUAL')
+                        <span class="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">💻 Virtual</span>
+                    @else
+                        <span class="text-[10px] bg-pink-100 text-pink-700 font-bold px-2 py-0.5 rounded-full">🎁 Física</span>
+                    @endif
+                    @if($recompensa->recurrente ?? false)
+                        <span class="text-[10px] bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">🔄 Recurrente</span>
+                    @endif
+                </div>
                 @if($recompensa->descripcion)
-                    <p class="text-slate-500 text-sm mb-3 leading-snug">{{ $recompensa->descripcion }}</p>
+                    <p class="text-slate-500 text-sm mb-3 leading-snug flex-1">{{ $recompensa->descripcion }}</p>
                 @endif
 
                 <div class="mt-auto pt-3 border-t border-slate-100">

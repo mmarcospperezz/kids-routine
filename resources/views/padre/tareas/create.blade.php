@@ -15,6 +15,34 @@
         <p class="text-slate-500 text-sm mt-1">Define una tarea para uno de tus hijos</p>
     </div>
 
+    {{-- Plantillas rápidas --}}
+    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4">
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Plantillas rápidas</p>
+        <div class="flex flex-wrap gap-2" id="plantillas">
+            @foreach(\App\Models\Tarea::categoriasPredefinidas() as $nombre => $icono)
+                <button type="button"
+                        onclick="usarPlantilla('{{ $nombre }}', '{{ $icono }}')"
+                        class="bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 text-xs font-medium px-3 py-1.5 rounded-xl transition">
+                    {{ $icono }} {{ $nombre }}
+                </button>
+            @endforeach
+            @foreach([
+                ['Hacer la cama','🛏️','Higiene personal'],
+                ['Recoger la habitación','🧹','Orden y limpieza'],
+                ['Ducharse','🚿','Higiene personal'],
+                ['Poner la mesa','🍽️','Tareas del hogar'],
+                ['Leer 20 minutos','📖','Lectura'],
+                ['Sacar a pasear al perro','🐕','Mascotas'],
+            ] as [$titulo, $icono, $cat])
+                <button type="button"
+                        onclick="usarPlantilla('{{ $titulo }}', '{{ $icono }}', '{{ $cat }}')"
+                        class="bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 text-xs font-medium px-3 py-1.5 rounded-xl transition">
+                    {{ $icono }} {{ $titulo }}
+                </button>
+            @endforeach
+        </div>
+    </div>
+
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <form action="{{ route('padre.tareas.store') }}" method="POST" class="space-y-5" id="formTarea">
             @csrf
@@ -57,6 +85,31 @@
                            class="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                 </div>
                 @error('monedas_recompensa') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Categoría</label>
+                    <select name="categoria"
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white" id="campoCat">
+                        <option value="">— Sin categoría —</option>
+                        @foreach(\App\Models\Tarea::categoriasPredefinidas() as $nombre => $icono)
+                            <option value="{{ $nombre }}" {{ old('categoria') == $nombre ? 'selected' : '' }}>
+                                {{ $icono }} {{ $nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Franja horaria</label>
+                    <select name="franja"
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
+                        <option value="CUALQUIERA" {{ old('franja', 'CUALQUIERA') == 'CUALQUIERA' ? 'selected' : '' }}>🕐 Cualquier hora</option>
+                        <option value="MAÑANA"     {{ old('franja') == 'MAÑANA' ? 'selected' : '' }}>🌅 Mañana</option>
+                        <option value="TARDE"      {{ old('franja') == 'TARDE' ? 'selected' : '' }}>☀️ Tarde</option>
+                        <option value="NOCHE"      {{ old('franja') == 'NOCHE' ? 'selected' : '' }}>🌙 Noche</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Tipo de tarea -->
@@ -136,6 +189,15 @@
 </div>
 
 <script>
+function usarPlantilla(titulo, icono, categoria) {
+    document.querySelector('input[name="titulo"]').value = icono + ' ' + titulo;
+    if (categoria) {
+        const sel = document.getElementById('campoCat');
+        for (let i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].value === categoria) { sel.selectedIndex = i; break; }
+        }
+    }
+}
 function toggleRecurrencia() {
     const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
     document.getElementById('seccionRecurrencia').classList.toggle('hidden', tipo !== 'RECURRENTE');

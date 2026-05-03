@@ -1,15 +1,32 @@
-﻿@extends('layouts.hijo')
+@extends('layouts.hijo')
 
 @section('title', 'Mis tareas')
 
 @section('content')
 
-{{-- Progreso del día --}}
 @php
     $pct = $tareasTotal > 0 ? round(($tareasCompletadas / $tareasTotal) * 100) : 0;
     $allDone = $tareasTotal > 0 && $tareasCompletadas === $tareasTotal;
+    $racha = $hijo->racha_actual ?? 0;
+    $nivel = $hijo->nivel();
+    $monedasNext = $hijo->monedas_para_siguiente_nivel();
 @endphp
 
+{{-- Nivel + Racha --}}
+<div class="grid grid-cols-2 gap-3 mb-4">
+    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/25 text-center">
+        <div class="text-3xl font-extrabold text-white">{{ $nivel }}</div>
+        <div class="text-white/80 text-xs font-bold mt-0.5">Nivel</div>
+        <div class="text-white/60 text-xs mt-1">{{ $monedasNext }} <x-moneda class="inline w-3 h-3"/> para nivel {{ $nivel + 1 }}</div>
+    </div>
+    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-4 border border-white/25 text-center">
+        <div class="text-3xl font-extrabold text-white">🔥 {{ $racha }}</div>
+        <div class="text-white/80 text-xs font-bold mt-0.5">Racha</div>
+        <div class="text-white/60 text-xs mt-1">Máximo: {{ $hijo->racha_max ?? 0 }} días</div>
+    </div>
+</div>
+
+{{-- Progreso del día --}}
 <div class="card-fade bg-white/20 backdrop-blur-sm rounded-3xl p-5 mb-5 border border-white/25 shadow-lg">
     <div class="flex items-center justify-between mb-3">
         <div>
@@ -61,10 +78,10 @@
                         'RECHAZADA'  => 'bg-red-50    border-red-200',
                         'CADUCADA'   => 'bg-gray-50   border-gray-200',
                     ];
+                    $franjaLabel = $instancia->tarea->franjaLabel();
                 @endphp
                 <div class="task-card bg-white rounded-2xl p-4 border {{ $colors[$estado] ?? 'border-gray-200' }} shadow-sm">
                     <div class="flex items-center gap-3">
-                        <!-- Icono de estado -->
                         <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0
                              {{ $estado === 'VALIDADA' ? 'bg-green-100' : ($estado === 'RECHAZADA' ? 'bg-red-100' : ($estado === 'COMPLETADA' ? 'bg-blue-100' : 'bg-amber-100')) }}">
                             {{ $icons[$estado] ?? '📌' }}
@@ -72,25 +89,45 @@
 
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-gray-800 text-sm leading-tight">{{ $instancia->tarea->titulo }}</p>
-                            <div class="flex items-center gap-2 mt-1">
+                            <div class="flex items-center gap-2 mt-1 flex-wrap">
                                 <span class="text-xs font-semibold text-yellow-600 flex items-center gap-0.5">
                                     <x-moneda /> {{ $instancia->tarea->monedas_recompensa }}
                                 </span>
+                                @if($franjaLabel)
+                                    <span class="text-xs text-slate-400">{{ $franjaLabel }}</span>
+                                @endif
+                                @if($instancia->tarea->categoria)
+                                    <span class="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{{ $instancia->tarea->categoria }}</span>
+                                @endif
                                 @if($instancia->comentario_padre && $estado === 'RECHAZADA')
                                     <span class="text-xs text-red-500">· {{ $instancia->comentario_padre }}</span>
                                 @endif
                             </div>
+                            {{-- Foto prueba subida --}}
+                            @if($instancia->foto_prueba && $estado === 'COMPLETADA')
+                                <p class="text-xs text-blue-500 mt-1">📷 Foto enviada</p>
+                            @endif
                         </div>
 
-                        <!-- Acción / Badge -->
                         @if($estado === 'PENDIENTE')
-                            <form action="{{ route('hijo.tareas.completar', $instancia) }}" method="POST">
-                                @csrf
-                                <button type="submit"
+                            <div x-data="{ open: false }">
+                                <button @click="open = !open"
                                         class="btn-complete bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md">
                                     ¡Listo! ✓
                                 </button>
-                            </form>
+                                <div x-show="open" x-cloak class="mt-2">
+                                    <form action="{{ route('hijo.tareas.completar', $instancia) }}" method="POST" enctype="multipart/form-data">
+                                        @csrf
+                                        <label class="block text-xs text-slate-500 mb-1">📷 Foto de prueba (opcional)</label>
+                                        <input type="file" name="foto_prueba" accept="image/*" capture="environment"
+                                               class="text-xs w-full mb-2">
+                                        <button type="submit"
+                                                class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2 rounded-xl">
+                                            Confirmar ✓
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         @elseif($estado === 'COMPLETADA')
                             <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap">
                                 ⏳ Esperando...
@@ -110,6 +147,57 @@
         </div>
     @endif
 </div>
+
+{{-- Ranking entre hermanos --}}
+@if(isset($ranking) && $ranking->count() > 1)
+<div class="mb-5">
+    <h2 class="text-white font-extrabold text-lg mb-3 drop-shadow">🏆 Ranking esta semana</h2>
+    <div class="bg-white/20 backdrop-blur-sm rounded-2xl border border-white/25 overflow-hidden">
+        @foreach($ranking as $i => $h)
+        <div class="flex items-center gap-3 px-4 py-3 {{ !$loop->last ? 'border-b border-white/10' : '' }}
+                    {{ $h->id_hijo === $hijo->id_hijo ? 'bg-white/10' : '' }}">
+            <div class="text-xl font-extrabold text-white/80 w-6">
+                {{ ['🥇','🥈','🥉'][$i] ?? ($i+1) . '.' }}
+            </div>
+            @if($h->avatarUrl())
+                <img src="{{ $h->avatarUrl() }}" class="w-9 h-9 rounded-xl object-cover">
+            @else
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold"
+                     style="background: {{ $h->avatarColor() }}">
+                    {{ mb_strtoupper(mb_substr($h->nombre, 0, 1)) }}
+                </div>
+            @endif
+            <div class="flex-1">
+                <p class="text-white font-bold text-sm">{{ $h->nombre }}
+                    @if($h->id_hijo === $hijo->id_hijo)<span class="text-white/60 text-xs">(tú)</span>@endif
+                </p>
+            </div>
+            <div class="text-white font-extrabold text-sm flex items-center gap-1">
+                <x-moneda /> {{ $h->monedas_semana ?? 0 }}
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+
+{{-- Logros --}}
+@if(isset($logros) && $logros->isNotEmpty())
+<div class="mb-5">
+    <h2 class="text-white font-extrabold text-lg mb-3 drop-shadow">🏅 Mis logros</h2>
+    <div class="flex flex-wrap gap-2">
+        @foreach($logros as $logro)
+        <div class="bg-white/20 backdrop-blur-sm border border-white/25 rounded-2xl px-4 py-2 flex items-center gap-2">
+            <span class="text-xl">{{ $logro->icono }}</span>
+            <div>
+                <p class="text-white font-bold text-xs">{{ $logro->titulo }}</p>
+                <p class="text-white/60 text-xs">{{ $logro->pivot->fecha_obtenido ? \Carbon\Carbon::parse($logro->pivot->fecha_obtenido)->format('d/m/y') : '' }}</p>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 {{-- Canjes activos --}}
 @if($canjesPendientes->isNotEmpty())

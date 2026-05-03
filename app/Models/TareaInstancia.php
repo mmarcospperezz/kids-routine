@@ -13,6 +13,7 @@ class TareaInstancia extends Model
     protected $fillable = [
         'id_tarea', 'id_hijo', 'fecha_programada',
         'estado', 'fecha_completada', 'fecha_validada', 'comentario_padre',
+        'foto_prueba',
     ];
 
     protected $casts = [

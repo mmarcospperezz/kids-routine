@@ -28,14 +28,16 @@ class TareaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'id_hijo' => 'required|exists:hijos,id_hijo',
-            'titulo' => 'required|string|max:200',
-            'descripcion' => 'nullable|string|max:500',
+            'id_hijo'            => 'required|exists:hijos,id_hijo',
+            'titulo'             => 'required|string|max:200',
+            'descripcion'        => 'nullable|string|max:500',
             'monedas_recompensa' => 'required|integer|min:0|max:9999',
-            'tipo' => 'required|in:PUNTUAL,RECURRENTE',
-            'recurrencia' => 'required_if:tipo,RECURRENTE|nullable|in:DIARIA,SEMANAL,PERSONALIZADA',
-            'dias_semana' => 'required_if:recurrencia,PERSONALIZADA|nullable',
-            'fecha_fin' => 'nullable|date|after:today',
+            'tipo'               => 'required|in:PUNTUAL,RECURRENTE',
+            'recurrencia'        => 'required_if:tipo,RECURRENTE|nullable|in:DIARIA,SEMANAL,PERSONALIZADA',
+            'dias_semana'        => 'required_if:recurrencia,PERSONALIZADA|nullable',
+            'fecha_fin'          => 'nullable|date|after:today',
+            'franja'             => 'nullable|in:CUALQUIERA,MAÑANA,TARDE,NOCHE',
+            'categoria'          => 'nullable|string|max:60',
         ]);
 
         $hijo = Hijo::findOrFail($data['id_hijo']);

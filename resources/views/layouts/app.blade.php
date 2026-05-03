@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Panel') — Kids Routine</title>
     <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
+    <!-- PWA -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#4f46e5">
+    <script>
+        // Apply dark mode before paint to avoid flash
+        if (localStorage.getItem('dark_mode') === '1') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes fadeInDown {
@@ -36,6 +45,17 @@
         #sidebar nav::-webkit-scrollbar-thumb { background: rgba(165,180,252,0.25); border-radius: 99px; }
         #sidebar nav::-webkit-scrollbar-thumb:hover { background: rgba(165,180,252,0.5); }
         #sidebar nav { scrollbar-width: thin; scrollbar-color: rgba(165,180,252,0.25) transparent; }
+        /* Dark mode */
+        .dark body { background-color: #0f172a; color: #e2e8f0; }
+        .dark .bg-white { background-color: #1e293b !important; }
+        .dark .bg-slate-50 { background-color: #0f172a !important; }
+        .dark .border-slate-100 { border-color: #334155 !important; }
+        .dark .text-gray-800, .dark .text-gray-900 { color: #f1f5f9 !important; }
+        .dark .text-slate-500, .dark .text-slate-600 { color: #94a3b8 !important; }
+        .dark .bg-slate-50.hover\:bg-white { background-color: #1e293b !important; }
+        .dark input, .dark select, .dark textarea { background-color: #1e293b !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+        .dark .bg-emerald-50 { background-color: #064e3b !important; }
+        .dark .bg-red-50 { background-color: #450a0a !important; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -152,6 +172,22 @@
                {{ request()->routeIs('padre.juegos.*') ? 'bg-white/20 text-white shadow-sm' : 'text-indigo-200 hover:bg-white/10 hover:text-white' }}">
                 <span class="w-5 text-center">🎮</span> Juegos
             </a>
+            <a href="{{ route('padre.estadisticas') }}"
+               class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 text-sm font-medium
+               {{ request()->routeIs('padre.estadisticas') ? 'bg-white/20 text-white shadow-sm' : 'text-indigo-200 hover:bg-white/10 hover:text-white' }}">
+                <span class="w-5 text-center">📊</span> Estadísticas
+            </a>
+
+            @php $pendPin = \App\Models\SolicitudPin::whereIn('id_hijo', $hijoIds)->where('estado','PENDIENTE')->count(); @endphp
+            @if($pendPin > 0)
+            <a href="{{ route('padre.solicitudes_pin.index') }}"
+               class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 text-sm font-medium
+               {{ request()->routeIs('padre.solicitudes_pin.*') ? 'bg-white/20 text-white shadow-sm' : 'text-indigo-200 hover:bg-white/10 hover:text-white' }}">
+                <span class="w-5 text-center">🔑</span>
+                <span class="flex-1">Cambios PIN</span>
+                <span class="bg-yellow-400 text-yellow-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ $pendPin }}</span>
+            </a>
+            @endif
 
             <div class="border-t border-indigo-700/40 my-3"></div>
             <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-widest px-2 mb-2">Niños</p>
@@ -162,6 +198,11 @@
         </nav>
 
         <div class="px-3 py-3 border-t border-indigo-700/40 space-y-1">
+            <button onclick="toggleDarkMode()" id="darkModeBtn"
+                    class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-indigo-200 hover:bg-white/10 hover:text-white">
+                <span class="w-5 text-center" id="darkModeIcon">🌙</span>
+                <span id="darkModeLabel">Modo oscuro</span>
+            </button>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
@@ -283,6 +324,23 @@
     <script>
         function openSidebar()  { document.getElementById('sidebar').classList.remove('-translate-x-full'); document.getElementById('overlay').classList.remove('hidden'); }
         function closeSidebar() { document.getElementById('sidebar').classList.add('-translate-x-full');    document.getElementById('overlay').classList.add('hidden'); }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', isDark ? '1' : '0');
+            document.getElementById('darkModeIcon').textContent  = isDark ? '☀️' : '🌙';
+            document.getElementById('darkModeLabel').textContent = isDark ? 'Modo claro' : 'Modo oscuro';
+        }
+        // Sync label on load
+        if (localStorage.getItem('dark_mode') === '1') {
+            document.getElementById('darkModeIcon').textContent  = '☀️';
+            document.getElementById('darkModeLabel').textContent = 'Modo claro';
+        }
+
+        // Register service worker (PWA)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>

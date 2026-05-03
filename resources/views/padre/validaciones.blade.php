@@ -37,6 +37,9 @@
                                 <p class="text-sm text-slate-500 mt-0.5">
                                     <span class="font-medium">{{ $instancia->hijo->nombre }}</span>
                                     · completada {{ $instancia->fecha_completada?->diffForHumans() }}
+                                    @if($instancia->tarea->franjaLabel())
+                                        · {{ $instancia->tarea->franjaLabel() }}
+                                    @endif
                                 </p>
                             </div>
                             <div class="flex items-center gap-1 bg-amber-100 text-amber-700 font-extrabold px-3 py-1 rounded-full text-sm flex-shrink-0">
@@ -44,6 +47,16 @@
                                 <span>+{{ $instancia->tarea->monedas_recompensa }}</span>
                             </div>
                         </div>
+
+                        {{-- Foto de prueba --}}
+                        @if($instancia->foto_prueba)
+                            <div class="mt-2 mb-3">
+                                <p class="text-xs font-bold text-slate-500 mb-1">📷 Foto de prueba:</p>
+                                <img src="{{ $instancia->foto_prueba }}" alt="Foto prueba"
+                                     class="max-h-40 rounded-xl border border-slate-200 shadow-sm cursor-pointer"
+                                     onclick="this.classList.toggle('max-h-40')">
+                            </div>
+                        @endif
 
                         <!-- Acciones -->
                         <div class="flex gap-2 mt-4 flex-wrap">

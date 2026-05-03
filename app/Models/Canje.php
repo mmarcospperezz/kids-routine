@@ -12,12 +12,13 @@ class Canje extends Model
 
     protected $fillable = [
         'id_hijo', 'id_recompensa', 'monedas_gastadas',
-        'estado', 'fecha_resolucion', 'comentario',
+        'estado', 'fecha_resolucion', 'comentario', 'fecha_caducidad',
     ];
 
     protected $casts = [
-        'fecha_solicitud' => 'datetime',
+        'fecha_solicitud'  => 'datetime',
         'fecha_resolucion' => 'datetime',
+        'fecha_caducidad'  => 'date',
     ];
 
     public function hijo()

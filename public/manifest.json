@@ -1,0 +1,20 @@
+{
+    "name": "Kids Routine",
+    "short_name": "Kids Routine",
+    "description": "Convierte las rutinas en aventuras para tus hijos",
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#4f46e5",
+    "theme_color": "#4f46e5",
+    "icons": [
+        {
+            "src": "/images/logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["education", "lifestyle"],
+    "lang": "es"
+}

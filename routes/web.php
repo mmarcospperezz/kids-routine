@@ -10,16 +10,24 @@ use App\Http\Controllers\Padre\ValidacionController;
 use App\Http\Controllers\Padre\CanjeController;
 use App\Http\Controllers\Padre\PerfilController;
 use App\Http\Controllers\Padre\JuegoController as PadreJuegoController;
+use App\Http\Controllers\Padre\MonedaController;
+use App\Http\Controllers\Padre\EstadisticasController;
+use App\Http\Controllers\Padre\SolicitudPinController;
 use App\Http\Controllers\Hijo\SesionController;
 use App\Http\Controllers\Hijo\DashboardController as HijoDashboardController;
 use App\Http\Controllers\Hijo\JuegoController as HijoJuegoController;
 use App\Http\Controllers\Hijo\PerfilController as HijoPerfilController;
+use App\Http\Controllers\Hijo\SolicitudPinController as HijoSolicitudPinController;
 use Illuminate\Support\Facades\Route;
 
 // Página de inicio
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+// Páginas legales
+Route::get('/privacidad', fn() => view('legal.privacidad'))->name('privacidad');
+Route::get('/terminos',   fn() => view('legal.terminos'))->name('terminos');
 
 // Auth de padres
 Route::middleware('guest')->group(function () {
@@ -72,6 +80,17 @@ Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
     // Configuración de juegos educativos
     Route::get('/juegos', [PadreJuegoController::class, 'index'])->name('juegos.index');
     Route::post('/juegos', [PadreJuegoController::class, 'guardar'])->name('juegos.guardar');
+
+    // Ajuste manual de monedas
+    Route::post('/hijos/{hijo}/monedas/ajustar', [MonedaController::class, 'ajustar'])->name('hijos.monedas.ajustar');
+
+    // Estadísticas
+    Route::get('/estadisticas', [EstadisticasController::class, 'index'])->name('estadisticas');
+
+    // Solicitudes de cambio de PIN
+    Route::get('/solicitudes-pin', [SolicitudPinController::class, 'index'])->name('solicitudes_pin.index');
+    Route::post('/solicitudes-pin/{solicitud}/aprobar', [SolicitudPinController::class, 'aprobar'])->name('solicitudes_pin.aprobar');
+    Route::post('/solicitudes-pin/{solicitud}/rechazar', [SolicitudPinController::class, 'rechazar'])->name('solicitudes_pin.rechazar');
 });
 
 // Sesión del hijo (necesita padre logueado)
@@ -97,4 +116,7 @@ Route::middleware(['padre', 'hijo'])->prefix('hijo')->name('hijo.')->group(funct
     Route::get('/juegos', [HijoJuegoController::class, 'index'])->name('juegos');
     Route::get('/juegos/{juego}', [HijoJuegoController::class, 'jugar'])->name('juegos.jugar');
     Route::post('/juegos/{juego}/completar', [HijoJuegoController::class, 'completar'])->name('juegos.completar');
+
+    // Solicitud de cambio de PIN
+    Route::post('/perfil/solicitar-pin', [HijoSolicitudPinController::class, 'solicitar'])->name('perfil.solicitar_pin');
 });

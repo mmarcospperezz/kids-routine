@@ -26,6 +26,27 @@
         </div>
     </div>
 
+    {{-- Ajuste rápido de monedas --}}
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-5">
+        <h2 class="text-sm font-extrabold text-amber-800 mb-3">⚡ Ajuste rápido de monedas</h2>
+        @if(session('exito'))
+            <div class="bg-green-100 text-green-800 rounded-xl px-4 py-2 text-sm mb-3">{{ session('exito') }}</div>
+        @endif
+        <form action="{{ route('padre.hijos.monedas.ajustar', $hijo) }}" method="POST" class="flex flex-col sm:flex-row gap-3">
+            @csrf
+            <input type="number" name="cantidad" placeholder="Ej: +10 o -5" step="1" required
+                   class="flex-1 border border-amber-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400">
+            <input type="text" name="motivo" placeholder="Motivo (ej: comportamiento ejemplar)" required maxlength="200"
+                   class="flex-[2] border border-amber-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400">
+            <button type="submit"
+                    class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-sm">
+                Aplicar
+            </button>
+        </form>
+        @error('cantidad') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+        @error('motivo')   <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+    </div>
+
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <form action="{{ route('padre.hijos.update', $hijo) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf @method('PUT')
@@ -48,7 +69,6 @@
                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Monedas actuales <x-moneda /></label>
                 <input type="number" name="monedas" value="{{ old('monedas', $hijo->monedas) }}" required min="0"
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
-                <p class="text-slate-400 text-xs mt-1.5">💡 Puedes ajustar el saldo manualmente si es necesario</p>
                 @error('monedas') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 

@@ -44,6 +44,32 @@
                 @error('monedas_necesarias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
 
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Tipo</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="radio" name="tipo" value="FISICA" {{ old('tipo','FISICA') === 'FISICA' ? 'checked' : '' }} class="text-indigo-600">
+                            <span>🎁 Física</span>
+                            <span class="text-xs text-slate-400">(objeto real)</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="radio" name="tipo" value="VIRTUAL" {{ old('tipo') === 'VIRTUAL' ? 'checked' : '' }} class="text-indigo-600">
+                            <span>💻 Virtual</span>
+                            <span class="text-xs text-slate-400">(digital/tiempo)</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Opciones</label>
+                    <label class="flex items-center gap-2 cursor-pointer text-sm">
+                        <input type="checkbox" name="recurrente" value="1" {{ old('recurrente') ? 'checked' : '' }} class="text-indigo-600 rounded">
+                        <span>🔄 Recurrente</span>
+                    </label>
+                    <p class="text-xs text-slate-400 mt-1">El hijo puede canjearla varias veces</p>
+                </div>
+            </div>
+
             <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex items-start gap-3">
                 <span class="text-xl flex-shrink-0">💡</span>
                 <p class="text-sm text-amber-800">Esta recompensa estará disponible para <strong>todos tus hijos</strong>. Asegúrate de que el coste en monedas sea apropiado.</p>

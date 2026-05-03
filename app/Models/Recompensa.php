@@ -13,11 +13,18 @@ class Recompensa extends Model
     protected $fillable = [
         'nombre', 'descripcion', 'monedas_necesarias',
         'imagen_url', 'activa', 'id_padre',
+        'tipo', 'recurrente',
     ];
 
     protected $casts = [
-        'activa' => 'boolean',
+        'activa'     => 'boolean',
+        'recurrente' => 'boolean',
     ];
+
+    public function esVirtual(): bool
+    {
+        return $this->tipo === 'VIRTUAL';
+    }
 
     public function padre()
     {

@@ -23,10 +23,14 @@ class RecompensaController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nombre' => 'required|string|max:150',
-            'descripcion' => 'nullable|string|max:500',
+            'nombre'             => 'required|string|max:150',
+            'descripcion'        => 'nullable|string|max:500',
             'monedas_necesarias' => 'required|integer|min:1|max:99999',
+            'tipo'               => 'nullable|in:FISICA,VIRTUAL',
+            'recurrente'         => 'nullable|boolean',
         ]);
+        $data['tipo']       = $data['tipo'] ?? 'FISICA';
+        $data['recurrente'] = $request->boolean('recurrente');
 
         Auth::user()->recompensas()->create($data);
 

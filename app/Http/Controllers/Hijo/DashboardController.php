@@ -11,6 +11,7 @@ use App\Models\Canje;
 use App\Models\HistorialMonedas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -38,12 +39,34 @@ class DashboardController extends Controller
             ->whereIn('estado', ['PENDIENTE', 'APROBADO'])
             ->get();
 
+        // Ranking semanal entre hermanos
+        $semanaInicio = now()->startOfWeek();
+        $hermanos = Hijo::where('id_padre', $hijo->id_padre)
+            ->where('activo', true)
+            ->get()
+            ->map(function ($h) use ($semanaInicio) {
+                $h->monedas_semana = DB::table('historial_monedas')
+                    ->where('id_hijo', $h->id_hijo)
+                    ->where('cantidad', '>', 0)
+                    ->where('fecha', '>=', $semanaInicio)
+                    ->sum('cantidad');
+                return $h;
+            })
+            ->sortByDesc('monedas_semana')
+            ->values();
+
+        $ranking = $hermanos->count() > 1 ? $hermanos : collect();
+
+        // Logros del hijo
+        $logros = $hijo->logros()->orderByPivot('fecha_obtenido', 'desc')->get();
+
         return view('hijo.dashboard', compact(
-            'hijo', 'instanciasHoy', 'canjesPendientes', 'tareasCompletadas', 'tareasTotal'
+            'hijo', 'instanciasHoy', 'canjesPendientes', 'tareasCompletadas', 'tareasTotal',
+            'ranking', 'logros'
         ));
     }
 
-    public function completarTarea(TareaInstancia $instancia)
+    public function completarTarea(Request $request, TareaInstancia $instancia)
     {
         $hijo = $this->hijoActual();
 
@@ -51,12 +74,45 @@ class DashboardController extends Controller
             abort(403);
         }
 
-        $instancia->update([
-            'estado' => 'COMPLETADA',
-            'fecha_completada' => now(),
+        $request->validate([
+            'foto_prueba' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
         ]);
 
+        $datos = [
+            'estado'           => 'COMPLETADA',
+            'fecha_completada' => now(),
+        ];
+
+        if ($request->hasFile('foto_prueba')) {
+            $datos['foto_prueba'] = $this->resizeFotoPrueba($request->file('foto_prueba')->getRealPath());
+        }
+
+        $instancia->update($datos);
+
         return back()->with('exito', '¡Genial! Has completado la tarea. Espera a que tu padre la valide.');
+    }
+
+    private function resizeFotoPrueba(string $path): string
+    {
+        $src = imagecreatefromstring(file_get_contents($path));
+        if (function_exists('exif_read_data')) {
+            $exif = @exif_read_data($path);
+            $src = match ($exif['Orientation'] ?? 1) {
+                3 => imagerotate($src, 180, 0),
+                6 => imagerotate($src, -90, 0),
+                8 => imagerotate($src, 90, 0),
+                default => $src,
+            };
+        }
+        $w = imagesx($src); $h = imagesy($src);
+        $ratio = $w / $h;
+        $nw = $ratio > 1 ? min($w, 600) : (int) (min($h, 600) * $ratio);
+        $nh = $ratio > 1 ? (int) ($nw / $ratio) : min($h, 600);
+        $dst = imagecreatetruecolor($nw, $nh);
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+        ob_start(); imagejpeg($dst, null, 80); $jpeg = ob_get_clean();
+        imagedestroy($src); imagedestroy($dst);
+        return 'data:image/jpeg;base64,' . base64_encode($jpeg);
     }
 
     public function recompensas()
@@ -86,6 +142,17 @@ class DashboardController extends Controller
             return back()->withErrors(['monedas' => 'No tienes suficientes monedas para esta recompensa.']);
         }
 
+        // Recompensas no recurrentes: solo un canje activo a la vez
+        if (!$recompensa->recurrente) {
+            $yaActivo = Canje::where('id_hijo', $hijo->id_hijo)
+                ->where('id_recompensa', $recompensa->id_recompensa)
+                ->whereIn('estado', ['PENDIENTE', 'APROBADO'])
+                ->exists();
+            if ($yaActivo) {
+                return back()->withErrors(['monedas' => 'Ya tienes un canje pendiente de esta recompensa.']);
+            }
+        }
+
         DB::transaction(function () use ($hijo, $recompensa) {
             $saldoAnterior = $hijo->monedas;
             $saldoPosterior = $saldoAnterior - $recompensa->monedas_necesarias;
@@ -93,20 +160,26 @@ class DashboardController extends Controller
             $hijo->update(['monedas' => $saldoPosterior]);
 
             $canje = Canje::create([
-                'id_hijo' => $hijo->id_hijo,
-                'id_recompensa' => $recompensa->id_recompensa,
+                'id_hijo'          => $hijo->id_hijo,
+                'id_recompensa'    => $recompensa->id_recompensa,
                 'monedas_gastadas' => $recompensa->monedas_necesarias,
+                'fecha_caducidad'  => now()->addDays(30)->toDateString(),
             ]);
 
             HistorialMonedas::create([
-                'id_hijo' => $hijo->id_hijo,
-                'cantidad' => -$recompensa->monedas_necesarias,
+                'id_hijo'        => $hijo->id_hijo,
+                'cantidad'       => -$recompensa->monedas_necesarias,
                 'saldo_anterior' => $saldoAnterior,
-                'saldo_posterior' => $saldoPosterior,
-                'motivo' => 'CANJE',
-                'id_referencia' => $canje->id_canje,
+                'saldo_posterior'=> $saldoPosterior,
+                'motivo'         => 'CANJE',
+                'id_referencia'  => $canje->id_canje,
             ]);
         });
+
+        // Logro primer canje
+        try {
+            app(\App\Services\AchievementService::class)->onPrimerCanje($hijo);
+        } catch (\Throwable) {}
 
         return back()->with('exito', '¡Canje solicitado! Tu padre tiene que aprobarlo.');
     }

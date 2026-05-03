@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Mi espacio') — Kids Routine</title>
     <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#7c3aed">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});</script>
     <style>
         @keyframes floatStar {
             0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
@@ -116,12 +119,19 @@
                     </div>
                 </div>
 
-                <!-- Monedas + salir -->
+                <!-- Monedas + opciones + salir -->
                 <div class="flex items-center gap-2">
                     <div class="bg-yellow-400 rounded-2xl px-3 py-2 flex items-center gap-1.5 shadow-lg border-2 border-yellow-300">
                         <span class="sparkle text-xl"><x-moneda /></span>
                         <span class="font-extrabold text-yellow-900 text-lg leading-none">{{ $hijo->monedas }}</span>
                     </div>
+                    <!-- Botón cambiar PIN -->
+                    <button onclick="document.getElementById('modalPin').classList.remove('hidden')"
+                            class="flex flex-col items-center justify-center bg-white/20 hover:bg-white/30 rounded-xl px-2 py-1 text-white transition border border-white/20 min-w-[44px]"
+                            title="Cambiar PIN">
+                        <span class="text-base leading-none">🔑</span>
+                        <span class="text-[9px] font-bold leading-tight mt-0.5 opacity-90">PIN</span>
+                    </button>
                     <form action="{{ route('hijo.salir') }}" method="POST">
                         @csrf
                         <button type="submit"
@@ -154,6 +164,37 @@
             </div>
         </div>
     </header>
+
+    <!-- Modal cambiar PIN -->
+    <div id="modalPin" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 class="text-lg font-extrabold text-gray-800 mb-1">🔑 Cambiar mi PIN</h3>
+            <p class="text-slate-500 text-xs mb-4">Tu padre tiene que aprobar el cambio antes de que surta efecto.</p>
+            <form action="{{ route('hijo.perfil.solicitar_pin') }}" method="POST" class="space-y-3">
+                @csrf
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Nuevo PIN (4 dígitos)</label>
+                    <input type="password" name="nuevo_pin" maxlength="4" pattern="\d{4}" inputmode="numeric" required
+                           class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-center text-2xl tracking-widest focus:border-purple-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Confirmar PIN</label>
+                    <input type="password" name="nuevo_pin_confirm" maxlength="4" pattern="\d{4}" inputmode="numeric" required
+                           class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-center text-2xl tracking-widest focus:border-purple-400 outline-none">
+                </div>
+                <div class="flex gap-3 pt-1">
+                    <button type="button" onclick="document.getElementById('modalPin').classList.add('hidden')"
+                            class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-sm transition">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                            class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                        Solicitar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Contenido -->
     <main class="relative z-10 max-w-2xl mx-auto px-4 py-6 pb-10">

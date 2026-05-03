@@ -14,6 +14,7 @@ class Tarea extends Model
         'titulo', 'descripcion', 'monedas_recompensa',
         'tipo', 'recurrencia', 'dias_semana',
         'estado', 'fecha_fin', 'id_hijo',
+        'franja', 'categoria',
     ];
 
     protected $casts = [
@@ -44,5 +45,29 @@ class Tarea extends Model
             'PERSONALIZADA' => 'Días personalizados',
             default => 'Puntual',
         };
+    }
+
+    public function franjaLabel(): string
+    {
+        return match ($this->franja) {
+            'MAÑANA' => '🌅 Mañana',
+            'TARDE'  => '☀️ Tarde',
+            'NOCHE'  => '🌙 Noche',
+            default  => '',
+        };
+    }
+
+    public static function categoriasPredefinidas(): array
+    {
+        return [
+            'Higiene personal' => '🧼',
+            'Tareas del hogar' => '🏠',
+            'Deberes' => '📚',
+            'Deporte' => '⚽',
+            'Alimentación' => '🥗',
+            'Mascotas' => '🐾',
+            'Orden y limpieza' => '✨',
+            'Lectura' => '📖',
+        ];
     }
 }

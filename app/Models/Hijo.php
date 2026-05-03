@@ -17,6 +17,7 @@ class Hijo extends Model
         'nombre', 'edad', 'avatar', 'pin_hash',
         'monedas', 'monedas_tope', 'intentos_fallidos',
         'bloqueado_hasta', 'id_padre', 'activo',
+        'racha_actual', 'racha_max', 'racha_ultimo_dia', 'monedas_historicas',
     ];
 
     protected $hidden = ['pin_hash'];
@@ -24,6 +25,7 @@ class Hijo extends Model
     protected $casts = [
         'bloqueado_hasta' => 'datetime',
         'activo' => 'boolean',
+        'racha_ultimo_dia' => 'date',
     ];
 
     public function padre()
@@ -49,6 +51,47 @@ class Hijo extends Model
     public function historialMonedas()
     {
         return $this->hasMany(HistorialMonedas::class, 'id_hijo', 'id_hijo');
+    }
+
+    public function logros()
+    {
+        return $this->belongsToMany(Logro::class, 'hijo_logros', 'id_hijo', 'id_logro')
+                    ->withPivot('fecha_obtenido');
+    }
+
+    public function solicitudesPin()
+    {
+        return $this->hasMany(SolicitudPin::class, 'id_hijo', 'id_hijo');
+    }
+
+    public function partidas()
+    {
+        return $this->hasMany(\App\Models\Partida::class, 'id_hijo', 'id_hijo');
+    }
+
+    public function nivel(): int
+    {
+        $historicas = $this->monedas_historicas ?? 0;
+        if ($historicas < 50)  return 1;
+        if ($historicas < 150) return 2;
+        if ($historicas < 350) return 3;
+        if ($historicas < 700) return 4;
+        if ($historicas < 1200) return 5;
+        if ($historicas < 2000) return 6;
+        if ($historicas < 3000) return 7;
+        if ($historicas < 4500) return 8;
+        if ($historicas < 6500) return 9;
+        return 10;
+    }
+
+    public function monedas_para_siguiente_nivel(): int
+    {
+        $umbrales = [50, 150, 350, 700, 1200, 2000, 3000, 4500, 6500, PHP_INT_MAX];
+        $historicas = $this->monedas_historicas ?? 0;
+        foreach ($umbrales as $umbral) {
+            if ($historicas < $umbral) return $umbral - $historicas;
+        }
+        return 0;
     }
 
     public function estaBloqueado(): bool
