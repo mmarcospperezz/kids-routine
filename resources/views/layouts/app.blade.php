@@ -155,7 +155,7 @@
             </a>
         </nav>
 
-        <div class="px-3 py-3 border-t border-indigo-700/40">
+        <div class="px-3 py-3 border-t border-indigo-700/40 space-y-1">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit"
@@ -163,8 +163,65 @@
                     <span class="w-5 text-center">🚪</span> Cerrar Sesión
                 </button>
             </form>
+            <button onclick="document.getElementById('modalEliminarCuenta').classList.remove('hidden')"
+                    class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400/70 hover:bg-red-500/20 hover:text-red-400">
+                <span class="w-5 text-center">🗑️</span> Eliminar cuenta
+            </button>
         </div>
     </aside>
+
+    <!-- Modal eliminar cuenta -->
+    <div id="modalEliminarCuenta" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div class="text-center mb-5">
+                <div class="text-5xl mb-3">⚠️</div>
+                <h3 class="text-xl font-extrabold text-gray-800">¿Eliminar tu cuenta?</h3>
+                <p class="text-slate-500 text-sm mt-2">Se borrarán permanentemente tu cuenta, todos tus hijos, tareas, recompensas e historial. <strong>Esta acción no se puede deshacer.</strong></p>
+            </div>
+
+            <form action="{{ route('padre.perfil.cuenta.eliminar') }}" method="POST" id="formEliminarCuenta">
+                @csrf @method('DELETE')
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                    Escribe <span class="text-red-600 font-black">eliminar</span> para confirmar:
+                </label>
+                <input type="text" name="confirmacion" id="inputConfirmacion" autocomplete="off"
+                       class="w-full border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:border-red-400 outline-none transition mb-1"
+                       placeholder="eliminar">
+                @error('confirmacion')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </form>
+
+            <div class="flex gap-3 mt-4">
+                <button onclick="document.getElementById('modalEliminarCuenta').classList.add('hidden')"
+                        class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-sm transition">
+                    Cancelar
+                </button>
+                <button onclick="confirmarEliminar()"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                    Eliminar cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function confirmarEliminar() {
+        const val = document.getElementById('inputConfirmacion').value.trim().toLowerCase();
+        if (val !== 'eliminar') {
+            document.getElementById('inputConfirmacion').classList.add('border-red-400');
+            document.getElementById('inputConfirmacion').focus();
+            return;
+        }
+        document.getElementById('formEliminarCuenta').submit();
+    }
+    // Abrir modal si hay error de validación en el campo confirmacion
+    @if($errors->has('confirmacion'))
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('modalEliminarCuenta').classList.remove('hidden');
+        });
+    @endif
+    </script>
 
     <div class="lg:ml-64 min-h-screen flex flex-col">
         <header class="lg:hidden bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">

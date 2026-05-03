@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Padre;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class PerfilController extends Controller
 {
@@ -24,6 +25,24 @@ class PerfilController extends Controller
     {
         Auth::user()->update(['avatar' => null]);
         return back()->with('exito', 'Foto de perfil eliminada.');
+    }
+
+    public function eliminarCuenta(Request $request)
+    {
+        $request->validate([
+            'confirmacion' => ['required', 'in:eliminar'],
+        ], [
+            'confirmacion.in' => 'Debes escribir exactamente la palabra "eliminar".',
+        ]);
+
+        $user = Auth::user();
+        Auth::logout();
+        Session::invalidate();
+        Session::regenerateToken();
+
+        $user->delete();
+
+        return redirect('/')->with('exito', 'Tu cuenta ha sido eliminada.');
     }
 
     private function resizeToBase64(string $path): string

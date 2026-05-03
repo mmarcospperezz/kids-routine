@@ -36,6 +36,7 @@ Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/perfil/avatar', [PerfilController::class, 'updateAvatar'])->name('perfil.avatar');
     Route::delete('/perfil/avatar', [PerfilController::class, 'eliminarAvatar'])->name('perfil.avatar.eliminar');
+    Route::delete('/perfil/cuenta', [PerfilController::class, 'eliminarCuenta'])->name('perfil.cuenta.eliminar');
 
     // Gestión de hijos
     Route::get('/hijos', [HijoController::class, 'index'])->name('hijos.index');
