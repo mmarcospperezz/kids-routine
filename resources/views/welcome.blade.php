@@ -124,15 +124,16 @@
             </div>
 
             <!-- Contador social -->
-            <div class="mt-12 flex flex-wrap justify-center gap-8">
+            <div class="mt-12 grid grid-cols-3 gap-4 max-w-lg mx-auto">
                 @foreach([
-                    ['🏠', '200+', 'familias activas'],
-                    ['✅', '5.000+', 'tareas completadas'],
-                    ['🎮', '3.000+', 'partidas jugadas'],
-                ] as [$emoji, $num, $label])
-                <div class="text-center">
-                    <div class="text-3xl font-extrabold text-indigo-700">{{ $emoji }} {{ $num }}</div>
-                    <div class="text-sm text-slate-500 mt-0.5">{{ $label }}</div>
+                    ['🏠', '200+', 'familias activas',    'from-indigo-50 to-blue-50',   'text-indigo-600'],
+                    ['✅', '5.000+', 'tareas completadas', 'from-emerald-50 to-teal-50',  'text-emerald-600'],
+                    ['🎮', '3.000+', 'partidas jugadas',   'from-purple-50 to-pink-50',   'text-purple-600'],
+                ] as [$emoji, $num, $label, $bg, $color])
+                <div class="bg-gradient-to-br {{ $bg }} rounded-2xl px-4 py-4 border border-white shadow-sm">
+                    <div class="text-2xl mb-1">{{ $emoji }}</div>
+                    <div class="text-2xl font-extrabold {{ $color }} leading-none">{{ $num }}</div>
+                    <div class="text-xs text-slate-500 mt-1 leading-snug">{{ $label }}</div>
                 </div>
                 @endforeach
             </div>
