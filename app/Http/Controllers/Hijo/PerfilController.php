@@ -29,8 +29,7 @@ class PerfilController extends Controller
 
     private function toBase64($file): string
     {
-        $img = Image::read($file)->cover(300, 300);
-        $encoded = $img->toWebp(80);
-        return 'data:image/webp;base64,' . base64_encode($encoded);
+        $encoded = Image::read($file)->cover(300, 300)->toJpeg(85);
+        return 'data:image/jpeg;base64,' . base64_encode((string) $encoded);
     }
 }
