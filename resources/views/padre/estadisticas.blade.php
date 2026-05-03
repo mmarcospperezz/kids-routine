@@ -141,7 +141,7 @@
                 $tieneRechazada = $instDia->contains('estado', 'RECHAZADA');
                 $tienePendiente = $instDia->contains('estado', 'PENDIENTE') || $instDia->contains('estado', 'COMPLETADA');
                 $esHoy = $fecha === today()->format('Y-m-d');
-                $color = $tieneValidada ? 'bg-green-100 text-green-700' : ($tieneRechazada ? 'bg-red-100 text-red-600' : ($tienePendiente ? 'bg-amber-100 text-amber-700' : 'text-slate-400'));
+                $color = $tieneValidada ? 'bg-green-500 text-white' : ($tieneRechazada ? 'bg-red-500 text-white' : ($tienePendiente ? 'bg-amber-400 text-white' : 'text-slate-300'));
             @endphp
             <div class="aspect-square flex items-center justify-center rounded-xl text-xs font-bold
                         {{ $color }} {{ $esHoy ? 'ring-2 ring-indigo-400' : '' }}">
@@ -150,9 +150,9 @@
         @endfor
     </div>
     <div class="flex gap-4 mt-3 text-xs text-slate-500">
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-100 rounded inline-block"></span> Validado</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-100 rounded inline-block"></span> Pendiente</span>
-        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-100 rounded inline-block"></span> Rechazado</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-500 rounded inline-block"></span> Validado</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-400 rounded inline-block"></span> Pendiente</span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-500 rounded inline-block"></span> Rechazado</span>
     </div>
 </div>
 
