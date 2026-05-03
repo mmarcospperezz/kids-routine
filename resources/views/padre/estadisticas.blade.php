@@ -127,10 +127,11 @@
         $diasMes = $mesActual->daysInMonth;
         $primerDia = (int) $mesActual->copy()->startOfMonth()->format('N'); // 1=lun, 7=dom
     @endphp
-    <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-2">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"
+         class="text-center text-xs font-bold text-slate-400 mb-2">
         @foreach(['L','M','X','J','V','S','D'] as $d) <div>{{ $d }}</div> @endforeach
     </div>
-    <div class="grid grid-cols-7 gap-1">
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
         @for($i = 1; $i < $primerDia; $i++)<div></div>@endfor
         @for($dia = 1; $dia <= $diasMes; $dia++)
             @php
