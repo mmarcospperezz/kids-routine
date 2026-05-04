@@ -99,11 +99,14 @@ kids_routine/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Auth/          → Login, Registro
-│   │   │   ├── Padre/         → Dashboard, Hijo, Tarea, Recompensa, Validacion, Canje
+│   │   │   ├── Padre/         → Dashboard, Hijo, Tarea, Recompensa, Validacion, Canje, Estadisticas
 │   │   │   └── Hijo/          → Sesion (PIN), Dashboard hijo
 │   │   └── Middleware/
 │   │       ├── EsPadre.php    → Comprueba que hay sesión de padre
 │   │       └── EsHijo.php     → Comprueba que hay sesión de hijo en session()
+│   ├── Models/
+│   └── Services/
+│       └── AchievementService.php → Rachas, logros y niveles (centraliza toda la gamificación)
 │   └── Models/
 │       ├── User.php           → tabla: usuarios
 │       ├── Hijo.php           → tabla: hijos
@@ -178,7 +181,26 @@ kids_routine/
     <td>id_hijo, juego, monedas_ganadas, created_at</td>
     <td>Historial de partidas ganadas; se filtra por fecha para el límite diario</td>
   </tr>
+  <tr>
+    <td><strong>logros</strong></td><td><code>id</code></td>
+    <td>clave (unique), nombre, descripcion, icono, monedas_bonus</td>
+    <td>Catálogo de logros desbloqueables (primera tarea, 5/25/100 tareas, primera partida, primer canje…)</td>
+  </tr>
+  <tr>
+    <td><strong>hijo_logros</strong></td><td><code>id_hijo, id_logro</code></td>
+    <td>obtenido_at</td>
+    <td>Tabla pivot: registra qué logros ha obtenido cada hijo y cuándo</td>
+  </tr>
 </table>
+
+<div class="callout-yellow callout">
+  <strong>Columnas añadidas en la megamigración:</strong>
+  <ul>
+    <li><code>hijos</code>: <code>racha_actual</code> INT, <code>racha_max</code> INT, <code>monedas_historicas</code> INT (acumulador que nunca baja, para calcular nivel)</li>
+    <li><code>tareas</code>: <code>franja</code> ENUM(<code>CUALQUIERA</code>, <code>MANANA</code>, <code>TARDE</code>, <code>NOCHE</code>), <code>categoria</code> VARCHAR(50)</li>
+  </ul>
+  Nota: el valor se llama <code>MANANA</code> (sin tilde) en el ENUM para evitar problemas de charset en MySQL en Railway.
+</div>
 
 <div class="callout-yellow callout">
   <strong>Decisión de diseño:</strong> Las tablas usan nombres en español (<code>usuarios</code>, <code>hijos</code>…) en vez de los convencionales de Laravel (<code>users</code>). Por eso los modelos definen explícitamente <code>$table</code> y <code>$primaryKey</code>. También se desactivan los timestamps automáticos con <code>public $timestamps = false</code> y se gestiona <code>fecha_creacion</code> manualmente donde hace falta.
@@ -335,6 +357,7 @@ resources/views/
 │   ├── recompensas/              → index, create
 │   ├── validaciones.blade.php    → lista de tareas pendientes de validar
 │   ├── canjes.blade.php          → lista de solicitudes de recompensa
+│   ├── estadisticas.blade.php    → dashboard: tasas, gráfico semanal, juegos, calendario
 │   └── juegos/index.blade.php    → configuración de juegos (monedas + activo)
 ├── hijo/
 │   ├── seleccionar.blade.php     → elige qué hijo entra
@@ -507,7 +530,110 @@ try {
 </pre>
 
 <!-- ============================================================ -->
-<h2>11. Despliegue en Railway</h2>
+<h2 class="page-break">11. Gamificación avanzada — Rachas, Logros y Niveles</h2>
+
+<p>Además del sistema básico de monedas, la app incorpora mecánicas de gamificación para aumentar la motivación: rachas de días consecutivos, logros desbloqueables y sistema de niveles. Toda la lógica está centralizada en <code>app/Services/AchievementService.php</code>.</p>
+
+<h3>AchievementService — patrón de uso</h3>
+<pre>
+// ValidacionController — al validar una tarea:
+$achievements = app(AchievementService::class)->onTareaValidada($hijo);
+
+// JuegoController — al completar una partida:
+$achievements = app(AchievementService::class)->onPartidaGanada($hijo);
+</pre>
+<p>Devuelve un array de notificaciones (nombre, icono, monedas) para mostrar al usuario.</p>
+
+<h3>Rachas (Streaks)</h3>
+<table>
+  <tr><th>Campo en hijos</th><th>Tipo</th><th>Descripción</th></tr>
+  <tr><td><code>racha_actual</code></td><td>INT default 0</td><td>Días consecutivos con al menos 1 tarea validada</td></tr>
+  <tr><td><code>racha_max</code></td><td>INT default 0</td><td>Racha máxima histórica del hijo</td></tr>
+</table>
+<p>Lógica: al validar una tarea se comprueba si el día anterior ya tenía una instancia validada. Si sí, <code>racha_actual++</code>; si no, se reinicia a 1. Se actualiza <code>racha_max</code> si se supera. Bonus de monedas al alcanzar 7 días (+50 monedas) y 30 días (+200 monedas), registrado con motivo <code>'BONIFICACION'</code>.</p>
+
+<h3>Logros</h3>
+<table>
+  <tr><th>Clave</th><th>Trigger</th><th>Bonus</th></tr>
+  <tr><td><code>primera_tarea</code></td><td>1ª tarea validada</td><td>10 monedas</td></tr>
+  <tr><td><code>5_tareas</code></td><td>5 tareas validadas</td><td>25 monedas</td></tr>
+  <tr><td><code>25_tareas</code></td><td>25 tareas validadas</td><td>50 monedas</td></tr>
+  <tr><td><code>100_tareas</code></td><td>100 tareas validadas</td><td>100 monedas</td></tr>
+  <tr><td><code>primera_partida</code></td><td>1ª partida ganada</td><td>15 monedas</td></tr>
+  <tr><td><code>10_partidas</code></td><td>10 partidas ganadas</td><td>30 monedas</td></tr>
+  <tr><td><code>primer_canje</code></td><td>1er canje solicitado</td><td>20 monedas</td></tr>
+</table>
+
+<h3>Niveles (1–10)</h3>
+<pre>
+// Hijo.php
+public function nivel(): int {
+    $m = $this->monedas_historicas; // nunca baja — solo sube al ganar
+    if ($m >= 10000) return 10;
+    if ($m >= 5000)  return 9;
+    if ($m >= 2500)  return 8;
+    // ...
+    return 1;
+}
+</pre>
+<p><code>monedas_historicas</code> es un contador acumulativo en la tabla <code>hijos</code> que nunca se descuenta al canjear, a diferencia de <code>monedas</code>. Esto permite calcular el nivel en O(1) sin consultar el historial completo.</p>
+
+<h3>Mejoras en tareas: franja horaria y categoría</h3>
+<table>
+  <tr><th>Campo</th><th>Valores</th><th>Uso</th></tr>
+  <tr><td><code>franja</code></td><td>CUALQUIERA / MANANA / TARDE / NOCHE</td><td>El hijo ve sus tareas agrupadas por momento del día</td></tr>
+  <tr><td><code>categoria</code></td><td>VARCHAR libre (predefinidas: Higiene, Hogar, Deberes…)</td><td>Filtro visual, icono en la tarea</td></tr>
+</table>
+<p>Al crear una tarea (<code>padre/tareas/create.blade.php</code>) el padre puede elegir franja y categoría mediante plantillas rápidas o manualmente.</p>
+
+<!-- ============================================================ -->
+<h2>12. Estadísticas y Calendario</h2>
+
+<p>El panel de estadísticas (<code>GET /padre/estadisticas</code> → <code>EstadisticasController@index</code>) ofrece al padre una visión global de toda la actividad de sus hijos.</p>
+
+<h3>Componentes del dashboard</h3>
+<table>
+  <tr><th>Bloque</th><th>Datos</th><th>Cómo se calcula</th></tr>
+  <tr><td>Resumen por hijo</td><td>Tasa completado %, monedas validadas, racha, nivel, barra de progreso</td><td>Agregación Eloquent sobre <code>tarea_instancias</code></td></tr>
+  <tr><td>Monedas por semana</td><td>Gráfico de barras — últimas 8 semanas</td><td><code>YEARWEEK(fecha,1)</code> agrupado en <code>historial_monedas</code></td></tr>
+  <tr><td>Juegos más jugados</td><td>TOP 5 por nº partidas + monedas ganadas</td><td><code>GROUP BY juego ORDER BY partidas DESC LIMIT 5</code></td></tr>
+  <tr><td>Partidas recientes</td><td>Últimas 20 partidas: hijo, juego, monedas, fecha</td><td><code>Partida::with('hijo')->latest()->limit(20)</code></td></tr>
+  <tr><td>Calendario del mes</td><td>Grid 7×N coloreado por estado de tareas</td><td>Ver detalle abajo</td></tr>
+</table>
+
+<h3>Gráfico de barras sin librerías</h3>
+<pre>
+@php $maxVal = $monedasSemana->max() ?: 1; @endphp
+&lt;div style="height:{{ round(($total / $maxVal) * 100) }}px; min-height:4px"
+     class="w-full rounded-t-lg bg-indigo-400"&gt;&lt;/div&gt;
+</pre>
+<p>Las alturas se normalizan al contenedor de 128px usando el máximo como denominador. Sin Chart.js ni ninguna librería externa.</p>
+
+<h3>Calendario — dos bugs resueltos</h3>
+<div class="callout-yellow callout">
+  <strong>Bug 1 — <code>grid-cols-7</code> en Tailwind v4:</strong> Tailwind v4 solo genera <code>grid-cols-1</code> a <code>grid-cols-6</code> en el CSS por defecto. <code>grid-cols-7</code> no aparece y el calendario se mostraba en una sola columna. Solución: usar inline style directamente:
+  <code>style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px"</code>
+</div>
+<div class="callout-yellow callout">
+  <strong>Bug 2 — claves <code>Y-m-d</code> nunca coinciden:</strong> <code>->groupBy('fecha_programada')</code> en Eloquent usa <code>Carbon::__toString()</code> como clave → <code>"2026-05-01 00:00:00"</code>. En la vista se buscaba con <code>$instanciasMes[$fecha]</code> donde <code>$fecha</code> era <code>"2026-05-01"</code>. Nunca coincidía → todos los días grises. Solución:
+  <pre>->selectRaw('DATE_FORMAT(fecha_programada, "%Y-%m-%d") as fecha_dia, estado, COUNT(*) as n')
+->groupBy('fecha_dia', 'estado')
+->get()
+->groupBy('fecha_dia');</pre>
+</div>
+
+<h3>Colores del calendario</h3>
+<table>
+  <tr><th>Color</th><th>Estado</th><th>Prioridad</th></tr>
+  <tr><td><span style="background:#22c55e;color:white;padding:2px 8px;border-radius:4px">Verde</span></td><td>VALIDADA</td><td>1ª — si alguna instancia del día está validada</td></tr>
+  <tr><td><span style="background:#fbbf24;padding:2px 8px;border-radius:4px">Ámbar</span></td><td>PENDIENTE / COMPLETADA</td><td>2ª — si hay pendientes pero ninguna validada</td></tr>
+  <tr><td><span style="background:#ef4444;color:white;padding:2px 8px;border-radius:4px">Rojo</span></td><td>RECHAZADA</td><td>3ª — solo rechazadas sin ninguna validada</td></tr>
+  <tr><td>Gris claro</td><td>Sin tareas</td><td>No hay instancias ese día</td></tr>
+</table>
+<p>La leyenda de colores usa <strong>inline styles</strong> en vez de clases Tailwind (<code>bg-green-500</code>) para garantizar que se muestre independientemente de lo que Tailwind genere.</p>
+
+<!-- ============================================================ -->
+<h2 class="page-break">13. Despliegue en Railway</h2>
 
 <h3>Infraestructura</h3>
 <table>
@@ -550,7 +676,7 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 </ol>
 
 <!-- ============================================================ -->
-<h2 class="page-break">12. Preguntas frecuentes en la defensa</h2>
+<h2 class="page-break">14. Preguntas frecuentes en la defensa</h2>
 
 <h3>¿Por qué Laravel y no otro framework?</h3>
 <p>Laravel es el framework PHP más usado en España y el sector. Ofrece ORM (Eloquent), sistema de migraciones, autenticación, y una comunidad enorme. Para un TFG de DAW es la elección natural en backend PHP.</p>
@@ -604,6 +730,12 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
 <h3>¿Qué es <code>DB::transaction()</code> y por qué lo usas?</h3>
 <p>Agrupa varias operaciones de BD en una transacción atómica: o se completan todas o no se aplica ninguna. En el módulo de juegos, una partida ganada implica: actualizar monedas del hijo + crear registro en <code>partidas</code> + crear registro en <code>historial_monedas</code>. Sin transacción, si falla el paso 2, el hijo tendría monedas sin registro de auditoría — inconsistencia. Con <code>DB::transaction()</code>, si cualquier paso lanza una excepción, se hace rollback automático de todo.</p>
 
+<h3>¿Qué es un Service en Laravel y por qué usaste uno para los logros?</h3>
+<p>Un Service es una clase PHP simple (sin herencia de Laravel) que encapsula lógica de negocio compleja que no pertenece a un único controlador. El <code>AchievementService</code> centraliza rachas, logros y niveles: si lo hubiera puesto en el controlador de validaciones, habría que duplicarlo en el de juegos y en el de canjes. Con el servicio, cualquier controlador llama a <code>app(AchievementService::class)->onTareaValidada($hijo)</code> y obtiene el resultado sin saber cómo está implementado por dentro.</p>
+
+<h3>¿Cómo se generan las estadísticas sin una librería de gráficos?</h3>
+<p>El gráfico de barras semanales se construye en HTML puro: cada barra es un <code>&lt;div&gt;</code> con altura calculada en Blade como porcentaje del máximo (<code>round(($total / $maxVal) * 100)px</code>). El calendario es un <code>display:grid</code> con 7 columnas. Sin Chart.js ni ninguna dependencia externa, lo que simplifica el bundle y el mantenimiento.</p>
+
 <h3>¿Has hecho tests automatizados?</h3>
 <p>No se implementaron tests unitarios ni de integración en este TFG, por limitación de tiempo y alcance. Laravel incluye PHPUnit y la clase <code>TestCase</code> para escribirlos. Las pruebas se realizaron manualmente en local con Laragon y en producción con Railway. Como mejora futura, escribiría tests para los flujos críticos: validación de tareas, canje de recompensas y límite diario de juegos.</p>
 
@@ -613,7 +745,7 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
   <li><strong>Tests automatizados</strong> con PHPUnit para los flujos críticos.</li>
   <li><strong>Notificaciones push</strong> cuando el padre valida una tarea (usando Laravel Notifications).</li>
   <li><strong>App móvil</strong> con una API REST + React Native o Flutter, ya que el target principal son niños con móvil/tablet.</li>
-  <li><strong>Más juegos</strong> y sistema de rachas (streak) para motivar la constancia.</li>
+  <li><strong>Más juegos</strong> educativos (los 5 actuales son un buen punto de partida).</li>
 </ul>
 
 <h3>¿Qué problemas encontraste en el desarrollo?</h3>
@@ -623,10 +755,13 @@ cmd = "php artisan config:cache && php artisan route:cache && php artisan migrat
   <li><strong>PIN vs Auth de Laravel:</strong> Laravel Auth está pensado para email+contraseña. El PIN del hijo usa <code>Hash::check()</code> manualmente con gestión de bloqueo propia.</li>
   <li><strong>Migración DDL en Railway:</strong> MySQL no es transaccional en DDL; una migración fallida a mitad dejaba la tabla creada físicamente pero sin registro en <code>migrations</code>. Al reintentar el deploy fallaba con "table already exists". Solución: <code>Schema::hasTable()</code> + <code>try/catch</code>.</li>
   <li><strong>Emoji 🪙 no soportado en dispositivos antiguos:</strong> Unicode 13.0 no disponible en algunos sistemas. Solución: Blade component <code>&lt;x-moneda /&gt;</code> con SVG inline.</li>
+  <li><strong>Tailwind v4 no genera <code>grid-cols-7</code>:</strong> Tailwind CSS v4 solo incluye en el CSS generado las clases que detecta en los archivos. <code>grid-cols-7</code> no estaba en ningún archivo de referencia y no se generaba, rompiendo el calendario. Solución: inline style <code>display:grid;grid-template-columns:repeat(7,1fr)</code>.</li>
+  <li><strong>Claves del calendario no coincidían:</strong> <code>->groupBy('fecha_programada')</code> en Eloquent usa <code>Carbon::__toString()</code> como clave de la colección, que incluye la hora (<code>"2026-05-01 00:00:00"</code>). En la vista se buscaba por <code>"2026-05-01"</code> → nunca coincidía → todos los días grises. Solución: <code>DATE_FORMAT(fecha_programada, "%Y-%m-%d")</code> en el <code>selectRaw</code>.</li>
+  <li><strong>ENUM con carácter Ñ en MySQL:</strong> El valor <code>'MAÑANA'</code> en un ENUM causaba errores de charset en Railway (utf8mb3 vs utf8mb4). Solución: renombrar el valor a <code>'MANANA'</code> (sin tilde) en la migración, el modelo y las vistas.</li>
 </ul>
 
 <!-- ============================================================ -->
-<h2>13. Datos de demo para la presentación</h2>
+<h2>15. Datos de demo para la presentación</h2>
 
 <div class="callout-green callout">
   <strong>URL:</strong> https://kids-routine-production.up.railway.app
