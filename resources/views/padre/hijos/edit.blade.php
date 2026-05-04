@@ -35,6 +35,7 @@
         <form action="{{ route('padre.hijos.monedas.ajustar', $hijo) }}" method="POST" class="flex flex-col sm:flex-row gap-3">
             @csrf
             <input type="number" name="cantidad" placeholder="Ej: +10 o -5" step="1" required
+                   onwheel="this.blur()"
                    class="flex-1 border border-amber-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400">
             <input type="text" name="motivo" placeholder="Motivo (ej: comportamiento ejemplar)" required maxlength="200"
                    class="flex-[2] border border-amber-300 rounded-xl px-4 py-2.5 text-sm bg-white focus:ring-2 focus:ring-amber-400">
@@ -68,6 +69,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Monedas actuales <x-moneda /></label>
                 <input type="number" name="monedas" value="{{ old('monedas', $hijo->monedas) }}" required min="0"
+                       onwheel="this.blur()"
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                 @error('monedas') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
@@ -83,6 +85,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Tope de monedas (opcional)</label>
                 <input type="number" name="monedas_tope" value="{{ old('monedas_tope', $hijo->monedas_tope) }}" min="1"
+                       onwheel="this.blur()"
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white"
                        placeholder="Sin límite">
                 @error('monedas_tope') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

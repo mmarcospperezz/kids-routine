@@ -82,6 +82,7 @@
                 <div class="flex items-center gap-3">
                     <span class="text-2xl"><x-moneda /></span>
                     <input type="number" name="monedas_recompensa" value="{{ old('monedas_recompensa', 5) }}" required min="0" max="9999"
+                           onwheel="this.blur()"
                            class="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white">
                 </div>
                 @error('monedas_recompensa') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

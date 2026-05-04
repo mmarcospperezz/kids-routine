@@ -64,6 +64,7 @@
                                name="juegos[{{ $slug }}][monedas_por_partida]"
                                value="{{ $monedas }}"
                                min="1" max="50" required
+                               onwheel="this.blur()"
                                class="w-20 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-center bg-slate-50 hover:bg-white">
                         <span class="text-xs text-slate-400">máx. 50</span>
                     </div>
