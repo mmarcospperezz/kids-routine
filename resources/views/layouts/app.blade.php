@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Panel') — Kids Routine</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237c3aed'/><circle cx='22' cy='32' r='11' fill='white'/><ellipse cx='22' cy='57' rx='12' ry='14' fill='white'/><circle cx='78' cy='32' r='11' fill='white'/><ellipse cx='78' cy='57' rx='12' ry='14' fill='white'/><ellipse cx='50' cy='65' rx='9' ry='11' fill='white'/><circle cx='50' cy='41' r='10' fill='white'/></svg>" type="image/svg+xml">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237c3aed'/%3E%3Ccircle cx='22' cy='32' r='11' fill='white'/%3E%3Cellipse cx='22' cy='57' rx='12' ry='14' fill='white'/%3E%3Ccircle cx='78' cy='32' r='11' fill='white'/%3E%3Cellipse cx='78' cy='57' rx='12' ry='14' fill='white'/%3E%3Cellipse cx='50' cy='65' rx='9' ry='11' fill='white'/%3E%3Ccircle cx='50' cy='41' r='10' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
     <!-- PWA -->
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="theme-color" content="#4f46e5">
