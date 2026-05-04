@@ -110,12 +110,13 @@
                         </div>
 
                         @if($estado === 'PENDIENTE')
-                            <div x-data="{ open: false }">
-                                <button @click="open = !open"
+                            <div>
+                                <button type="button"
+                                        onclick="this.closest('div').querySelector('.form-completar').classList.toggle('hidden'); this.classList.add('hidden')"
                                         class="btn-complete bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md">
                                     ¡Listo! ✓
                                 </button>
-                                <div x-show="open" x-cloak class="mt-2">
+                                <div class="form-completar hidden mt-2">
                                     <form action="{{ route('hijo.tareas.completar', $instancia) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         <label class="block text-xs text-slate-500 mb-1">📷 Foto de prueba (opcional)</label>
