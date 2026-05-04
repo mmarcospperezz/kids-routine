@@ -29,29 +29,27 @@ class ValidacionController extends Controller
     {
         $this->autorizarInstancia($instancia);
 
-        DB::transaction(function () use ($instancia) {
-            $hijo = $instancia->hijo;
-            $monedas = $instancia->tarea->monedas_recompensa;
-            $saldoAnterior = $hijo->monedas;
-            $saldoPosterior = $saldoAnterior + $monedas;
+        $hijo = $instancia->hijo;
+        $monedas = $instancia->tarea->monedas_recompensa;
+        $saldoAnterior = $hijo->monedas;
+        $saldoPosterior = $saldoAnterior + $monedas;
 
-            if ($hijo->monedas_tope !== null) {
-                $saldoPosterior = min($saldoPosterior, $hijo->monedas_tope);
-                $monedas = $saldoPosterior - $saldoAnterior;
-            }
+        if ($hijo->monedas_tope !== null) {
+            $saldoPosterior = min($saldoPosterior, $hijo->monedas_tope);
+            $monedas = $saldoPosterior - $saldoAnterior;
+        }
 
-            $hijo->update([
-                'monedas'            => $saldoPosterior,
-                'monedas_historicas' => ($hijo->monedas_historicas ?? 0) + $monedas,
-            ]);
+        // Transacción core: solo monedas + historial + estado
+        DB::transaction(function () use ($instancia, $hijo, $monedas, $saldoAnterior, $saldoPosterior) {
+            $hijo->update(['monedas' => $saldoPosterior]);
 
             HistorialMonedas::create([
-                'id_hijo'        => $hijo->id_hijo,
-                'cantidad'       => $monedas,
-                'saldo_anterior' => $saldoAnterior,
-                'saldo_posterior'=> $saldoPosterior,
-                'motivo'         => 'TAREA',
-                'id_referencia'  => $instancia->id_instancia,
+                'id_hijo'         => $hijo->id_hijo,
+                'cantidad'        => $monedas,
+                'saldo_anterior'  => $saldoAnterior,
+                'saldo_posterior' => $saldoPosterior,
+                'motivo'          => 'TAREA',
+                'id_referencia'   => $instancia->id_instancia,
             ]);
 
             $instancia->update([
@@ -60,9 +58,14 @@ class ValidacionController extends Controller
             ]);
         });
 
-        // Logros y racha (fuera de la transacción principal para no bloquear)
+        // Columna monedas_historicas (puede no existir en BD antigua)
         try {
-            app(AchievementService::class)->onTareaValidada($instancia->hijo);
+            $hijo->increment('monedas_historicas', $monedas);
+        } catch (\Throwable) {}
+
+        // Logros y racha
+        try {
+            app(AchievementService::class)->onTareaValidada($hijo->fresh());
         } catch (\Throwable) {}
 
         return back()->with('exito', "✅ Tarea validada. Se han añadido las monedas.");
