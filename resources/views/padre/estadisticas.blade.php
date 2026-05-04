@@ -54,14 +54,28 @@
 @if($monedasSemana->isNotEmpty())
 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
     <h2 class="font-extrabold text-gray-800 mb-4">💰 Monedas ganadas (últimas 8 semanas)</h2>
-    @php $maxVal = $monedasSemana->max() ?: 1; @endphp
-    <div class="flex items-end gap-2 h-32">
-        @foreach($monedasSemana as $semana => $total)
-        <div class="flex-1 flex flex-col items-center gap-1">
+    @php
+        $maxVal      = $monedasSemana->max() ?: 1;
+        $semanaVals  = $monedasSemana->values();
+        $totalSlots  = 8;
+        $emptySlots  = max(0, $totalSlots - $semanaVals->count());
+    @endphp
+    <div class="flex items-end gap-1.5 h-32">
+        {{-- Semanas vacías al inicio --}}
+        @for($i = 0; $i < $emptySlots; $i++)
+        <div class="flex flex-col items-center gap-1" style="width:32px;flex-shrink:0">
+            <div class="text-xs text-transparent">0</div>
+            <div class="w-full rounded-t bg-slate-100" style="height:4px"></div>
+            <div class="text-xs text-slate-300">S{{ $i + 1 }}</div>
+        </div>
+        @endfor
+        {{-- Datos reales --}}
+        @foreach($semanaVals as $idx => $total)
+        <div class="flex flex-col items-center gap-1" style="width:32px;flex-shrink:0">
             <div class="text-xs text-slate-500 font-bold">{{ $total }}</div>
             <div class="w-full rounded-t-lg bg-indigo-400 transition-all"
-                 style="height: {{ round(($total / $maxVal) * 100) }}px; min-height: 4px;"></div>
-            <div class="text-xs text-slate-400">S{{ $loop->iteration }}</div>
+                 style="height:{{ max(4, round(($total / $maxVal) * 112)) }}px"></div>
+            <div class="text-xs text-slate-400">S{{ $emptySlots + $idx + 1 }}</div>
         </div>
         @endforeach
     </div>
