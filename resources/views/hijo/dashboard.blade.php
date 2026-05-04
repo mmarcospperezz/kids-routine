@@ -116,14 +116,30 @@
                                         class="btn-complete bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md">
                                     ¡Listo! ✓
                                 </button>
-                                <div class="form-completar hidden mt-2">
+                                <div class="form-completar hidden mt-3">
                                     <form action="{{ route('hijo.tareas.completar', $instancia) }}" method="POST" enctype="multipart/form-data">
                                         @csrf
-                                        <label class="block text-xs text-slate-500 mb-1">📷 Foto de prueba (opcional)</label>
-                                        <input type="file" name="foto_prueba" accept="image/*" capture="environment"
-                                               class="text-xs w-full mb-2">
+                                        {{-- Selector de foto personalizado --}}
+                                        <input type="file" name="foto_prueba" id="foto_{{ $instancia->id_instancia }}"
+                                               accept="image/*" capture="environment" class="hidden"
+                                               onchange="previewFoto(this, 'preview_{{ $instancia->id_instancia }}', 'zona_{{ $instancia->id_instancia }}')">
+                                        <label for="foto_{{ $instancia->id_instancia }}"
+                                               id="zona_{{ $instancia->id_instancia }}"
+                                               class="flex flex-col items-center gap-1 w-full border-2 border-dashed border-purple-300 rounded-2xl py-3 px-3 cursor-pointer bg-purple-50 hover:bg-purple-100 transition mb-2">
+                                            <span class="text-2xl">📷</span>
+                                            <span class="text-xs font-bold text-purple-600">Añadir foto (opcional)</span>
+                                            <span class="text-xs text-slate-400">Toca para abrir la cámara</span>
+                                        </label>
+                                        <div id="preview_{{ $instancia->id_instancia }}" class="hidden mb-2 relative">
+                                            <img src="" alt="Vista previa"
+                                                 class="w-full max-h-32 object-cover rounded-xl border-2 border-purple-300">
+                                            <button type="button"
+                                                    onclick="quitarFoto('foto_{{ $instancia->id_instancia }}', 'preview_{{ $instancia->id_instancia }}', 'zona_{{ $instancia->id_instancia }}')"
+                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs font-bold flex items-center justify-center">✕</button>
+                                        </div>
                                         <button type="submit"
-                                                class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2 rounded-xl">
+                                                class="w-full text-white text-sm font-bold px-4 py-2.5 rounded-xl shadow-md"
+                                                style="background:linear-gradient(135deg,#7c3aed,#a855f7)">
                                             Confirmar ✓
                                         </button>
                                     </form>
@@ -228,4 +244,24 @@
     🛍️ Ir a la tienda de recompensas →
 </a>
 
+<script>
+function previewFoto(input, previewId, zonaId) {
+    const preview = document.getElementById(previewId);
+    const zona = document.getElementById(zonaId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.querySelector('img').src = e.target.result;
+            preview.classList.remove('hidden');
+            zona.classList.add('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function quitarFoto(inputId, previewId, zonaId) {
+    document.getElementById(inputId).value = '';
+    document.getElementById(previewId).classList.add('hidden');
+    document.getElementById(zonaId).classList.remove('hidden');
+}
+</script>
 @endsection
