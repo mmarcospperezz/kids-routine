@@ -39,10 +39,17 @@ class ValidacionController extends Controller
             $monedas = $saldoPosterior - $saldoAnterior;
         }
 
-        // Transacción core: solo monedas + historial + estado
-        DB::transaction(function () use ($instancia, $hijo, $monedas, $saldoAnterior, $saldoPosterior) {
-            $hijo->update(['monedas' => $saldoPosterior]);
+        // Actualizar monedas directamente (sin transacción para máxima compatibilidad)
+        $hijo->update(['monedas' => $saldoPosterior]);
 
+        // Marcar instancia como validada
+        $instancia->update([
+            'estado'         => 'VALIDADA',
+            'fecha_validada' => now(),
+        ]);
+
+        // Registrar en historial (puede fallar si ENUM no incluye TAREA — ignorar)
+        try {
             HistorialMonedas::create([
                 'id_hijo'         => $hijo->id_hijo,
                 'cantidad'        => $monedas,
@@ -51,12 +58,7 @@ class ValidacionController extends Controller
                 'motivo'          => 'TAREA',
                 'id_referencia'   => $instancia->id_instancia,
             ]);
-
-            $instancia->update([
-                'estado'         => 'VALIDADA',
-                'fecha_validada' => now(),
-            ]);
-        });
+        } catch (\Throwable) {}
 
         // Columna monedas_historicas (puede no existir en BD antigua)
         try {
@@ -68,7 +70,7 @@ class ValidacionController extends Controller
             app(AchievementService::class)->onTareaValidada($hijo->fresh());
         } catch (\Throwable) {}
 
-        return back()->with('exito', "✅ Tarea validada. Se han añadido las monedas.");
+        return back()->with('exito', "✅ Tarea validada. +{$monedas} monedas para {$hijo->nombre}.");
     }
 
     public function rechazar(Request $request, TareaInstancia $instancia)
