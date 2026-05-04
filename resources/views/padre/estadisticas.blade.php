@@ -50,37 +50,102 @@
     @endforeach
 </div>
 
-{{-- Monedas ganadas por semana --}}
-@if($monedasSemana->isNotEmpty())
+{{-- Historial de monedas ganadas --}}
 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-    <h2 class="font-extrabold text-gray-800 mb-4">💰 Monedas ganadas (últimas 8 semanas)</h2>
-    @php
-        $maxVal      = $monedasSemana->max() ?: 1;
-        $semanaVals  = $monedasSemana->values();
-        $totalSlots  = 8;
-        $emptySlots  = max(0, $totalSlots - $semanaVals->count());
-    @endphp
-    <div class="flex items-end gap-1.5 h-32">
-        {{-- Semanas vacías al inicio --}}
-        @for($i = 0; $i < $emptySlots; $i++)
-        <div class="flex flex-col items-center gap-1" style="width:32px;flex-shrink:0">
-            <div class="text-xs text-transparent">0</div>
-            <div class="w-full rounded-t bg-slate-100" style="height:4px"></div>
-            <div class="text-xs text-slate-300">S{{ $i + 1 }}</div>
+    <h2 class="font-extrabold text-gray-800 mb-4">💰 Historial de monedas (últimas 8 semanas)</h2>
+    @if($historialMonedas->isEmpty())
+        <p class="text-center text-slate-400 text-sm py-6">Sin monedas ganadas en las últimas 8 semanas</p>
+    @else
+    <div class="space-y-5">
+        @foreach($historialMonedas->sortKeysDesc() as $semana => $entries)
+        @php
+            $year  = (int) substr((string)$semana, 0, 4);
+            $nSem  = (int) substr((string)$semana, 4);
+            $lunes = \Carbon\Carbon::now()->setISODate($year, $nSem, 1);
+        @endphp
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Semana del {{ $lunes->format('d/m') }} al {{ $lunes->copy()->addDays(6)->format('d/m') }}
+                </span>
+                <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    +{{ $entries->sum('cantidad') }} <x-moneda />
+                </span>
+            </div>
+            <div class="space-y-1.5">
+                @foreach($entries as $entry)
+                <div class="flex items-center gap-3 bg-slate-50 rounded-xl px-3 py-2.5">
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg text-base flex-shrink-0
+                        {{ $entry->tipo === 'TAREA' ? 'bg-green-100' : 'bg-purple-100' }}">
+                        {{ $entry->tipo === 'TAREA' ? '✅' : '🎮' }}
+                    </span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-700 truncate">
+                            @if($entry->tipo === 'TAREA')
+                                {{ $entry->descripcion }}
+                            @else
+                                {{ ucwords(str_replace('_', ' ', $entry->descripcion)) }}
+                            @endif
+                        </p>
+                        <p class="text-xs text-slate-400">{{ $entry->hijo_nombre }}</p>
+                    </div>
+                    <span class="text-sm font-bold text-amber-600 flex-shrink-0 flex items-center gap-1">
+                        +{{ $entry->cantidad }} <x-moneda />
+                    </span>
+                </div>
+                @endforeach
+            </div>
         </div>
-        @endfor
-        {{-- Datos reales --}}
-        @foreach($semanaVals as $idx => $total)
-        <div class="flex flex-col items-center gap-1" style="width:32px;flex-shrink:0">
-            <div class="text-xs text-slate-500 font-bold">{{ $total }}</div>
-            <div class="w-full rounded-t-lg bg-indigo-400 transition-all"
-                 style="height:{{ max(4, round(($total / $maxVal) * 112)) }}px"></div>
-            <div class="text-xs text-slate-400">S{{ $emptySlots + $idx + 1 }}</div>
-        </div>
+        @if(!$loop->last)<hr class="border-slate-100 my-1">@endif
         @endforeach
     </div>
+    @endif
 </div>
-@endif
+
+{{-- Historial de validaciones --}}
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+    <h2 class="font-extrabold text-gray-800 mb-4">✅ Historial de validaciones (últimas 8 semanas)</h2>
+    @if($historialValidaciones->isEmpty())
+        <p class="text-center text-slate-400 text-sm py-6">Sin validaciones en las últimas 8 semanas</p>
+    @else
+    <div class="space-y-5">
+        @foreach($historialValidaciones->sortKeysDesc() as $semana => $entries)
+        @php
+            $year  = (int) substr((string)$semana, 0, 4);
+            $nSem  = (int) substr((string)$semana, 4);
+            $lunes = \Carbon\Carbon::now()->setISODate($year, $nSem, 1);
+        @endphp
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Semana del {{ $lunes->format('d/m') }} al {{ $lunes->copy()->addDays(6)->format('d/m') }}
+                </span>
+                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                    {{ $entries->count() }} {{ $entries->count() === 1 ? 'validación' : 'validaciones' }}
+                </span>
+            </div>
+            <div class="space-y-1.5">
+                @foreach($entries as $val)
+                <div class="flex items-center gap-3 bg-slate-50 rounded-xl px-3 py-2.5">
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-base flex-shrink-0">✅</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-700 truncate">{{ $val->titulo }}</p>
+                        <p class="text-xs text-slate-400">
+                            {{ $val->hijo_nombre }} · {{ \Carbon\Carbon::parse($val->fecha)->format('d/m H:i') }}
+                        </p>
+                    </div>
+                    <span class="text-sm font-bold text-amber-600 flex-shrink-0 flex items-center gap-1">
+                        +{{ $val->monedas }} <x-moneda />
+                    </span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @if(!$loop->last)<hr class="border-slate-100 my-1">@endif
+        @endforeach
+    </div>
+    @endif
+</div>
 
 <div class="grid md:grid-cols-2 gap-6 mb-6">
     {{-- Juegos más jugados --}}

@@ -16,16 +16,42 @@ class EstadisticasController extends Controller
         $hijos = $padre->hijos()->where('activo', true)->get();
         $hijoIds = $hijos->pluck('id_hijo');
 
-        // Monedas ganadas por semana (últimas 8 semanas)
-        $monedasSemana = DB::table('historial_monedas')
-            ->selectRaw('YEARWEEK(fecha, 1) as semana, SUM(cantidad) as total')
-            ->whereIn('id_hijo', $hijoIds)
-            ->where('cantidad', '>', 0)
-            ->where('fecha', '>=', now()->subWeeks(8))
-            ->groupByRaw('YEARWEEK(fecha, 1)')
-            ->orderBy('semana')
+        // Historial de monedas: tareas validadas + juegos (últimas 8 semanas)
+        $monedasTareas = DB::table('tarea_instancias as ti')
+            ->join('tareas as t', 'ti.id_tarea', '=', 't.id_tarea')
+            ->join('hijos as h', 'ti.id_hijo', '=', 'h.id_hijo')
+            ->selectRaw("t.monedas_recompensa as cantidad, t.titulo as descripcion, h.nombre as hijo_nombre, 'TAREA' as tipo, ti.fecha_validada as fecha, YEARWEEK(ti.fecha_validada, 1) as semana")
+            ->whereIn('ti.id_hijo', $hijoIds)
+            ->where('ti.estado', 'VALIDADA')
+            ->where('t.monedas_recompensa', '>', 0)
+            ->whereNotNull('ti.fecha_validada')
+            ->where('ti.fecha_validada', '>=', now()->subWeeks(8))
+            ->get();
+
+        $monedasJuegos = DB::table('partidas as p')
+            ->join('hijos as h', 'p.id_hijo', '=', 'h.id_hijo')
+            ->selectRaw("p.monedas_ganadas as cantidad, p.juego as descripcion, h.nombre as hijo_nombre, 'JUEGO' as tipo, p.created_at as fecha, YEARWEEK(p.created_at, 1) as semana")
+            ->whereIn('p.id_hijo', $hijoIds)
+            ->where('p.monedas_ganadas', '>', 0)
+            ->where('p.created_at', '>=', now()->subWeeks(8))
+            ->get();
+
+        $historialMonedas = $monedasTareas->concat($monedasJuegos)
+            ->sortByDesc('fecha')
+            ->groupBy('semana');
+
+        // Historial de validaciones (últimas 8 semanas)
+        $historialValidaciones = DB::table('tarea_instancias as ti')
+            ->join('tareas as t', 'ti.id_tarea', '=', 't.id_tarea')
+            ->join('hijos as h', 'ti.id_hijo', '=', 'h.id_hijo')
+            ->selectRaw("t.titulo, h.nombre as hijo_nombre, t.monedas_recompensa as monedas, ti.fecha_validada as fecha, YEARWEEK(ti.fecha_validada, 1) as semana")
+            ->whereIn('ti.id_hijo', $hijoIds)
+            ->where('ti.estado', 'VALIDADA')
+            ->whereNotNull('ti.fecha_validada')
+            ->where('ti.fecha_validada', '>=', now()->subWeeks(8))
+            ->orderByDesc('ti.fecha_validada')
             ->get()
-            ->mapWithKeys(fn($r) => [$r->semana => $r->total]);
+            ->groupBy('semana');
 
         // Tasa de completado por hijo
         $tasaCompletado = $hijos->map(function ($hijo) {
@@ -66,7 +92,7 @@ class EstadisticasController extends Controller
             ->groupBy('fecha_dia');
 
         return view('padre.estadisticas', compact(
-            'hijos', 'monedasSemana', 'tasaCompletado',
+            'hijos', 'historialMonedas', 'historialValidaciones', 'tasaCompletado',
             'juegosMasJugados', 'partidasRecientes', 'instanciasMes', 'mesActual'
         ));
     }
