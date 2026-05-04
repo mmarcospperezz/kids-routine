@@ -7,7 +7,6 @@ use App\Models\Hijo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class HijoController extends Controller
 {
@@ -29,13 +28,12 @@ class HijoController extends Controller
             'edad'         => 'required|integer|min:1|max:18',
             'pin'          => 'required|digits:4',
             'monedas_tope' => 'nullable|integer|min:0',
-            'avatar'       => 'nullable|image|max:2048',
+            'avatar'       => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
         ]);
 
-        $avatarNombre = null;
+        $avatar = null;
         if ($request->hasFile('avatar')) {
-            $avatarNombre = $request->file('avatar')->store('avatars', 'public');
-            $avatarNombre = basename($avatarNombre);
+            $avatar = $this->resizeToBase64($request->file('avatar')->getRealPath());
         }
 
         Auth::user()->hijos()->create([
@@ -44,7 +42,7 @@ class HijoController extends Controller
             'pin_hash'     => Hash::make($data['pin']),
             'monedas_tope' => $data['monedas_tope'] ?? null,
             'monedas'      => 0,
-            'avatar'       => $avatarNombre,
+            'avatar'       => $avatar,
         ]);
 
         return redirect()->route('padre.hijos.index')
@@ -67,7 +65,7 @@ class HijoController extends Controller
             'pin'          => 'nullable|digits:4',
             'monedas_tope' => 'nullable|integer|min:0',
             'monedas'      => 'required|integer|min:0',
-            'avatar'       => 'nullable|image|max:2048',
+            'avatar'       => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
         ]);
 
         $update = [
@@ -78,10 +76,7 @@ class HijoController extends Controller
         ];
 
         if ($request->hasFile('avatar')) {
-            if ($hijo->avatar) {
-                Storage::disk('public')->delete('avatars/' . $hijo->avatar);
-            }
-            $update['avatar'] = basename($request->file('avatar')->store('avatars', 'public'));
+            $update['avatar'] = $this->resizeToBase64($request->file('avatar')->getRealPath());
         }
 
         if (!empty($data['pin'])) {
@@ -109,5 +104,27 @@ class HijoController extends Controller
         if ($hijo->id_padre !== Auth::id()) {
             abort(403);
         }
+    }
+
+    private function resizeToBase64(string $path): string
+    {
+        $original = imagecreatefromstring(file_get_contents($path));
+        $ow = imagesx($original);
+        $oh = imagesy($original);
+        $size = 300;
+        $ratio = max($size / $ow, $size / $oh);
+        $nw = (int) round($ow * $ratio);
+        $nh = (int) round($oh * $ratio);
+        $tmp = imagecreatetruecolor($nw, $nh);
+        imagecopyresampled($tmp, $original, 0, 0, 0, 0, $nw, $nh, $ow, $oh);
+        $canvas = imagecreatetruecolor($size, $size);
+        imagecopy($canvas, $tmp, 0, 0, (int)(($nw - $size) / 2), (int)(($nh - $size) / 2), $size, $size);
+        imagedestroy($original);
+        imagedestroy($tmp);
+        ob_start();
+        imagejpeg($canvas, null, 85);
+        $jpeg = ob_get_clean();
+        imagedestroy($canvas);
+        return 'data:image/jpeg;base64,' . base64_encode($jpeg);
     }
 }
