@@ -28,10 +28,10 @@ class DashboardController extends Controller
         $instanciasHoy = TareaInstancia::with('tarea')
             ->where('id_hijo', $hijo->id_hijo)
             ->where('fecha_programada', today())
-            ->whereIn('estado', ['PENDIENTE', 'COMPLETADA', 'RECHAZADA'])
+            ->whereIn('estado', ['PENDIENTE', 'COMPLETADA', 'VALIDADA', 'RECHAZADA'])
             ->get();
 
-        $tareasCompletadas = $instanciasHoy->where('estado', 'COMPLETADA')->count();
+        $tareasCompletadas = $instanciasHoy->whereIn('estado', ['COMPLETADA', 'VALIDADA'])->count();
         $tareasTotal = $instanciasHoy->count();
 
         $canjesPendientes = Canje::with('recompensa')

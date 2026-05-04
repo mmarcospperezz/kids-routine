@@ -150,9 +150,14 @@
                                 ⏳ Esperando...
                             </span>
                         @elseif($estado === 'VALIDADA')
-                            <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">
-                                ✅ ¡Ganado!
-                            </span>
+                            <div class="flex flex-col items-center">
+                                <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap">
+                                    ✅ ¡Validado!
+                                </span>
+                                <span class="text-xs font-extrabold text-amber-500 mt-0.5 flex items-center gap-0.5">
+                                    +{{ $instancia->tarea->monedas_recompensa }} <x-moneda class="inline w-3 h-3"/>
+                                </span>
+                            </div>
                         @elseif($estado === 'RECHAZADA')
                             <span class="bg-red-100 text-red-600 text-xs font-bold px-3 py-1.5 rounded-full">
                                 ❌ Rechazada
