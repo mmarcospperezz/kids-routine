@@ -34,7 +34,7 @@ class ValidacionController extends Controller
         $saldoAnterior = $hijo->monedas;
         $saldoPosterior = $saldoAnterior + $monedas;
 
-        if ($hijo->monedas_tope !== null) {
+        if ($hijo->monedas_tope > 0) {
             $saldoPosterior = min($saldoPosterior, $hijo->monedas_tope);
             $monedas = $saldoPosterior - $saldoAnterior;
         }

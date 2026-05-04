@@ -82,7 +82,7 @@
 
             <div>
                 <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Tope de monedas (opcional)</label>
-                <input type="number" name="monedas_tope" value="{{ old('monedas_tope', $hijo->monedas_tope) }}" min="0"
+                <input type="number" name="monedas_tope" value="{{ old('monedas_tope', $hijo->monedas_tope) }}" min="1"
                        class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm bg-slate-50 hover:bg-white"
                        placeholder="Sin límite">
                 @error('monedas_tope') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

@@ -27,7 +27,7 @@ class HijoController extends Controller
             'nombre'       => 'required|string|max:100',
             'edad'         => 'required|integer|min:1|max:18',
             'pin'          => 'required|digits:4',
-            'monedas_tope' => 'nullable|integer|min:0',
+            'monedas_tope' => 'nullable|integer|min:1',
             'avatar'       => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
         ]);
 
@@ -63,7 +63,7 @@ class HijoController extends Controller
             'nombre'       => 'required|string|max:100',
             'edad'         => 'required|integer|min:1|max:18',
             'pin'          => 'nullable|digits:4',
-            'monedas_tope' => 'nullable|integer|min:0',
+            'monedas_tope' => 'nullable|integer|min:1',
             'monedas'      => 'required|integer|min:0',
             'avatar'       => 'nullable|file|mimes:jpg,jpeg,png,gif,webp|max:10240',
         ]);
