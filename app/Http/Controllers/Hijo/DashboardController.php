@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Hijo;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hijo;
-use App\Models\Tarea;
 use App\Models\TareaInstancia;
 use App\Models\Recompensa;
 use App\Models\Canje;
 use App\Models\HistorialMonedas;
+use App\Services\TareaInstanciaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,7 @@ class DashboardController extends Controller
     public function dashboard()
     {
         $hijo = $this->hijoActual();
-        $this->generarInstanciasHoy($hijo);
+        app(TareaInstanciaService::class)->generarInstanciasHoy($hijo);
 
         $instanciasHoy = TareaInstancia::with('tarea')
             ->where('id_hijo', $hijo->id_hijo)
@@ -184,37 +184,4 @@ class DashboardController extends Controller
         return back()->with('exito', '¡Canje solicitado! Tu padre tiene que aprobarlo.');
     }
 
-    private function generarInstanciasHoy(Hijo $hijo): void
-    {
-        $hoy = today();
-        $diaSemana = (string) $hoy->dayOfWeekIso;
-
-        $tareas = Tarea::where('id_hijo', $hijo->id_hijo)
-            ->where('estado', 'ACTIVA')
-            ->where('tipo', 'RECURRENTE')
-            ->where(function ($q) use ($hoy) {
-                $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', $hoy);
-            })
-            ->get();
-
-        foreach ($tareas as $tarea) {
-            $debeGenerarse = match ($tarea->recurrencia) {
-                'DIARIA' => true,
-                'SEMANAL' => $diaSemana === '1',
-                'PERSONALIZADA' => in_array($diaSemana, $tarea->diasSemanaArray()),
-                default => false,
-            };
-
-            if ($debeGenerarse) {
-                TareaInstancia::firstOrCreate(
-                    [
-                        'id_tarea' => $tarea->id_tarea,
-                        'id_hijo' => $hijo->id_hijo,
-                        'fecha_programada' => $hoy,
-                    ],
-                    ['estado' => 'PENDIENTE']
-                );
-            }
-        }
-    }
 }

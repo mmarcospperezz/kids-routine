@@ -298,8 +298,8 @@
 
     <!-- Cookie Banner -->
     <div id="cookie-banner"
-         class="bg-slate-900 text-white px-6 py-4 shadow-2xl"
-         style="display:none">
+         class="text-white px-6 py-4"
+         style="display:none;background:#0f172a;box-shadow:0 -4px 24px rgba(0,0,0,0.35)">
         <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-4 justify-between">
             <p class="text-sm text-slate-300">
                 Usamos cookies esenciales para el funcionamiento de la aplicación.
