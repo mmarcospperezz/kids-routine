@@ -43,8 +43,7 @@ class SesionController extends Controller
 
         if ($hijo->estaBloqueado()) {
             $minutos = (int) now()->diffInMinutes($hijo->bloqueado_hasta);
-            return redirect()->route('hijo.pin', $hijo)
-                ->withErrors(['pin' => "⛔ Demasiados intentos. Espera {$minutos} minuto(s)."]);
+            return back()->withErrors(['pin' => "⛔ Demasiados intentos. Espera {$minutos} minuto(s)."]);
         }
 
         if (!Hash::check($request->pin, $hijo->pin_hash)) {
@@ -55,15 +54,12 @@ class SesionController extends Controller
                 $update['bloqueado_hasta'] = now()->addMinutes(15);
                 $update['intentos_fallidos'] = 0;
                 $hijo->update($update);
-                return redirect()->route('hijo.pin', $hijo)
-                    ->withErrors(['pin' => '⛔ Bloqueado 15 minutos por demasiados intentos fallidos.']);
+                return back()->withErrors(['pin' => '⛔ Bloqueado 15 minutos por demasiados intentos fallidos.']);
             }
 
             $hijo->update($update);
             $restantes = 3 - $intentos;
-            return redirect()->route('hijo.pin', $hijo)
-                ->withErrors(['pin' => "❌ PIN incorrecto. Te quedan {$restantes} " . ($restantes === 1 ? 'intento' : 'intentos') . '.'
-                ]);
+            return back()->withErrors(['pin' => "❌ PIN incorrecto. Te quedan {$restantes} " . ($restantes === 1 ? 'intento' : 'intentos') . '.']);
         }
 
         $hijo->update(['intentos_fallidos' => 0, 'bloqueado_hasta' => null]);
