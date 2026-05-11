@@ -96,7 +96,7 @@ Route::middleware('padre')->prefix('padre')->name('padre.')->group(function () {
 // Sesión del hijo (necesita padre logueado)
 Route::middleware('padre')->prefix('hijo')->name('hijo.')->group(function () {
     Route::get('/seleccionar', [SesionController::class, 'seleccionar'])->name('seleccionar');
-    Route::post('/pin', [SesionController::class, 'mostrarPin'])->name('pin');
+    Route::get('/pin/{hijo}', [SesionController::class, 'mostrarPin'])->name('pin');
     Route::post('/verificar-pin', [SesionController::class, 'verificarPin'])->name('verificarPin');
     Route::post('/salir', [SesionController::class, 'salir'])->name('salir');
 });

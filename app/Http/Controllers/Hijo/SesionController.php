@@ -19,11 +19,8 @@ class SesionController extends Controller
         return view('hijo.seleccionar', compact('hijos'));
     }
 
-    public function mostrarPin(Request $request)
+    public function mostrarPin(Hijo $hijo)
     {
-        $request->validate(['id_hijo' => 'required|exists:hijos,id_hijo']);
-        $hijo = Hijo::findOrFail($request->id_hijo);
-
         if ($hijo->id_padre !== Auth::id()) {
             abort(403);
         }
@@ -46,9 +43,8 @@ class SesionController extends Controller
 
         if ($hijo->estaBloqueado()) {
             $minutos = (int) now()->diffInMinutes($hijo->bloqueado_hasta);
-            return back()
-                ->withErrors(['pin' => "Demasiados intentos fallidos. Espera {$minutos} minutos."])
-                ->with('id_hijo', $hijo->id_hijo);
+            return redirect()->route('hijo.pin', $hijo)
+                ->withErrors(['pin' => "⛔ Demasiados intentos. Espera {$minutos} minuto(s)."]);
         }
 
         if (!Hash::check($request->pin, $hijo->pin_hash)) {
@@ -58,14 +54,16 @@ class SesionController extends Controller
             if ($intentos >= 3) {
                 $update['bloqueado_hasta'] = now()->addMinutes(15);
                 $update['intentos_fallidos'] = 0;
+                $hijo->update($update);
+                return redirect()->route('hijo.pin', $hijo)
+                    ->withErrors(['pin' => '⛔ Bloqueado 15 minutos por demasiados intentos fallidos.']);
             }
 
             $hijo->update($update);
-
-            $restantes = max(0, 3 - $intentos);
-            return back()
-                ->withErrors(['pin' => "PIN incorrecto. Te quedan {$restantes} intentos."])
-                ->with('id_hijo', $hijo->id_hijo);
+            $restantes = 3 - $intentos;
+            return redirect()->route('hijo.pin', $hijo)
+                ->withErrors(['pin' => "❌ PIN incorrecto. Te quedan {$restantes} " . ($restantes === 1 ? 'intento' : 'intentos') . '.'
+                ]);
         }
 
         $hijo->update(['intentos_fallidos' => 0, 'bloqueado_hasta' => null]);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Quién eres? — Kids Routine</title>
-    <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237c3aed'/%3E%3Ccircle cx='22' cy='32' r='11' fill='white'/%3E%3Cellipse cx='22' cy='57' rx='12' ry='14' fill='white'/%3E%3Ccircle cx='78' cy='32' r='11' fill='white'/%3E%3Cellipse cx='78' cy='57' rx='12' ry='14' fill='white'/%3E%3Cellipse cx='50' cy='65' rx='9' ry='11' fill='white'/%3E%3Ccircle cx='50' cy='41' r='10' fill='white'/%3E%3C/svg%3E" type="image/svg+xml">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes float {
@@ -79,37 +79,33 @@
         @else
             <div class="space-y-4">
                 @foreach($hijos as $index => $hijo)
-                    <form action="{{ route('hijo.pin') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="id_hijo" value="{{ $hijo->id_hijo }}">
-                        <button type="submit"
-                                class="child-card card-in-{{ min($index + 1, 4) }} w-full bg-white/95 backdrop-blur rounded-2xl p-5 flex items-center gap-4 text-left shadow-xl border border-white/50">
-                            <!-- Avatar -->
-                            @if($hijo->avatarUrl())
-                                <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
-                                     class="w-16 h-16 rounded-2xl object-cover shadow-md flex-shrink-0 border-2 border-white/50">
-                            @else
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl text-white shadow-md flex-shrink-0"
-                                     style="background: {{ $hijo->avatarColor() }}">
-                                    {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
-                                </div>
-                            @endif
-                            <!-- Info -->
-                            <div class="flex-1 min-w-0">
-                                <p class="font-extrabold text-gray-800 text-xl leading-tight">{{ $hijo->nombre }}</p>
-                                <p class="text-gray-500 text-sm mt-0.5">{{ $hijo->edad }} años</p>
-                                <div class="flex items-center gap-1 mt-1">
-                                    <span class="text-base"><x-moneda /></span>
-                                    <span class="font-bold text-yellow-600 text-sm">{{ $hijo->monedas }} monedas</span>
-                                </div>
+                    <a href="{{ route('hijo.pin', $hijo->id_hijo) }}"
+                       class="child-card card-in-{{ min($index + 1, 4) }} w-full bg-white/95 backdrop-blur rounded-2xl p-5 flex items-center gap-4 text-left shadow-xl border border-white/50 block">
+                        <!-- Avatar -->
+                        @if($hijo->avatarUrl())
+                            <img src="{{ $hijo->avatarUrl() }}" alt="{{ $hijo->nombre }}"
+                                 class="w-16 h-16 rounded-2xl object-cover shadow-md flex-shrink-0 border-2 border-white/50">
+                        @else
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl text-white shadow-md flex-shrink-0"
+                                 style="background: {{ $hijo->avatarColor() }}">
+                                {{ mb_strtoupper(mb_substr($hijo->nombre, 0, 1)) }}
                             </div>
-                            <!-- Flecha -->
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl shadow-md flex-shrink-0"
-                                 style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
-                                →
+                        @endif
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0">
+                            <p class="font-extrabold text-gray-800 text-xl leading-tight">{{ $hijo->nombre }}</p>
+                            <p class="text-gray-500 text-sm mt-0.5">{{ $hijo->edad }} años</p>
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="text-base"><x-moneda /></span>
+                                <span class="font-bold text-yellow-600 text-sm">{{ $hijo->monedas }} monedas</span>
                             </div>
-                        </button>
-                    </form>
+                        </div>
+                        <!-- Flecha -->
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl shadow-md flex-shrink-0"
+                             style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
+                            →
+                        </div>
+                    </a>
                 @endforeach
             </div>
         @endif
