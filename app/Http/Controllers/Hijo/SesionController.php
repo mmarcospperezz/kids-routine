@@ -41,28 +41,10 @@ class SesionController extends Controller
             abort(403);
         }
 
-        if ($hijo->estaBloqueado()) {
-            $minutos = (int) now()->diffInMinutes($hijo->bloqueado_hasta);
-            return back()->withErrors(['pin' => "⛔ Demasiados intentos. Espera {$minutos} minuto(s)."]);
-        }
-
         if (!Hash::check($request->pin, $hijo->pin_hash)) {
-            $intentos = $hijo->intentos_fallidos + 1;
-            $update = ['intentos_fallidos' => $intentos];
-
-            if ($intentos >= 3) {
-                $update['bloqueado_hasta'] = now()->addMinutes(15);
-                $update['intentos_fallidos'] = 0;
-                $hijo->update($update);
-                return back()->withErrors(['pin' => '⛔ Bloqueado 15 minutos por demasiados intentos fallidos.']);
-            }
-
-            $hijo->update($update);
-            $restantes = 3 - $intentos;
-            return back()->withErrors(['pin' => "❌ PIN incorrecto. Te quedan {$restantes} " . ($restantes === 1 ? 'intento' : 'intentos') . '.']);
+            return back()->withErrors(['pin' => '❌ PIN incorrecto.']);
         }
 
-        $hijo->update(['intentos_fallidos' => 0, 'bloqueado_hasta' => null]);
         session(['hijo_id' => $hijo->id_hijo]);
 
         return redirect()->route('hijo.dashboard');
