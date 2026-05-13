@@ -113,15 +113,12 @@
                 </div>
             @endif
             <h2 class="text-3xl font-extrabold text-white drop-shadow-md">¡Hola, {{ $hijo->nombre }}!</h2>
-            <p class="text-white/75 text-base mt-1">Escribe tu PIN secreto 🔐</p>
+            @if($errors->any())
+                <p class="text-red-200 bg-red-500/40 rounded-xl px-3 py-1 text-base font-semibold mt-1 inline-block">{{ $errors->first() }}</p>
+            @else
+                <p class="text-white/75 text-base mt-1">Escribe tu PIN secreto 🔐</p>
+            @endif
         </div>
-
-        <!-- Error -->
-        @if($errors->any())
-            <div id="errorMsg" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-500/90 backdrop-blur text-white rounded-2xl px-6 py-3 text-center border border-red-400/50 font-semibold text-sm shadow-xl whitespace-nowrap">
-                {{ $errors->first() }}
-            </div>
-        @endif
 
         <!-- Slots del PIN -->
         <div class="fade-up2">
