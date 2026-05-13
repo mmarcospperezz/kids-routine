@@ -118,7 +118,7 @@
 
         <!-- Error -->
         @if($errors->any())
-            <div id="errorMsg" class="mb-4 bg-red-500/80 backdrop-blur text-white rounded-2xl px-4 py-3 text-center border border-red-400/50 font-semibold text-sm">
+            <div id="errorMsg" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-red-500/90 backdrop-blur text-white rounded-2xl px-6 py-3 text-center border border-red-400/50 font-semibold text-sm shadow-xl whitespace-nowrap">
                 {{ $errors->first() }}
             </div>
         @endif
