@@ -39,7 +39,7 @@
             <div class="flex gap-2">
                 <form action="{{ route('padre.solicitudes_pin.aprobar', $sol) }}" method="POST">
                     @csrf
-                    <button class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
+                    <button style="background:#16a34a" class="hover:opacity-90 text-white text-sm font-bold px-4 py-2 rounded-xl transition">
                         ✓ Aprobar
                     </button>
                 </form>
