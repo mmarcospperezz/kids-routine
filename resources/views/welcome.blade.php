@@ -181,7 +181,6 @@
                     ['⚡', 'Validación instantánea', 'Aprueba o rechaza tareas completadas con un solo clic desde tu panel.'],
                     ['👨‍👧‍👦', 'Múltiples hijos', 'Gestiona todos tus hijos y su ranking semanal desde un mismo panel unificado.'],
                     ['📊', 'Estadísticas', 'Gráficas de monedas ganadas, tareas completadas y juegos por semana.'],
-                    ['🌙', 'Modo oscuro', 'Cuida la vista de noche. El modo oscuro está disponible en todos los paneles.'],
                 ] as [$icon, $title, $desc])
                     <div class="feature-card bg-white rounded-2xl p-6 flex gap-4 shadow-sm border border-slate-100">
                         <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm"
